@@ -1,6 +1,19 @@
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
 const isDev = require("electron-is-dev");
+const { MongoClient } = require('mongodb');
+
+const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(dbUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+client.connect(err => {
+    const collection = client.db("test").collection("devices");
+    client.close();
+    console.log(collection);
+})
 
 function createWindow() {
     const win = new BrowserWindow({
