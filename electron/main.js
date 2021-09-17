@@ -1,8 +1,12 @@
 const path = require('path');
+const fs = require('fs');
+
 const { app, BrowserWindow } = require('electron');
 const isDev = require("electron-is-dev");
 
 function createWindow() {
+    const isInitialised = checkIfInitialised();
+
     const win = new BrowserWindow({
         width: 800,
         height: 600,
@@ -16,6 +20,18 @@ function createWindow() {
 
     if (isDev) {
         win.webContents.openDevTools({mode: "detach"});
+    }
+}
+
+function checkIfInitialised() {
+    const dir = '~/p2p/repository';
+
+    if (fs.existsSync(dir)) {
+        console.log('Initialised');
+        return true;
+    } else {
+        console.log('Not Initialised');
+        return false;
     }
 }
 
