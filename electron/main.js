@@ -3,24 +3,29 @@ const { app, BrowserWindow } = require('electron');
 const isDev = require("electron-is-dev");
 const { MongoClient } = require('mongodb');
 
+const helper = require('./helper');
+
+const isInitialised = helper.checkIfInitialised();
+
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(dbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
 
-client.connect(err => {
-    const collection = client.db("test").collection("devices");
-    client.close();
-    console.log(collection);
-})
+// client.connect(err => {
+//     const collection = client.db("test").collection("devices");
+//     client.close();
+//     console.log(collection);
+// })
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            preload: path.join(__dirname, 'preload.js')
         }
     });
     win.loadURL('http://localhost:3000');
