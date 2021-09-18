@@ -8,18 +8,24 @@ import './register.css';
 class RegisterPage extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {value: ''};
+        this.state = {name: '', email: ''};
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event) {
-        this.setState({value: event.target.value});
+        if (event.target.id === 'name') {
+            this.setState({name: event.target.value});
+        } else {
+            this.setState({email: event.target.value});
+        }
     }
 
     handleSubmit(event) {
-        window.api.send("register", this.state.value);
+        console.log(this.state);
+        window.api.send("register", this.state);
+        event.preventDefault()
     }
 
     render() {
@@ -53,8 +59,14 @@ class RegisterPage extends React.Component {
                         <Form onSubmit={this.handleSubmit}>
                             <Form.Group className="mb-3" controlId="name">
                                 <Form.Label>Name</Form.Label>
-                                <Form.Control value={this.state.value} onChange={this.handleChange} placeholder="John Doe"></Form.Control>
+                                <Form.Control value={this.state.name} onChange={this.handleChange} placeholder="John Doe"></Form.Control>
                             </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="email">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control type="email" value={this.state.email} onChange={this.handleChange} placeholder="john@doe.com"></Form.Control>
+                            </Form.Group>
+
                             <Button type="submit" variant="info">Submit</Button>
                         </Form>
                         <img
