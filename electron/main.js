@@ -28,7 +28,9 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js')
         }
     });
-    win.loadURL('http://localhost:3000');
+
+    const extension = helper.checkIfInitialised() ? '/' : '/register';
+    win.loadURL('http://localhost:3000' + extension);
     // win.loadURL(`file://${path.join(__dirname, "../public/index.html")}`);
     // win.loadFile('index.html');
 
