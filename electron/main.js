@@ -40,8 +40,7 @@ function createWindow() {
 }
 
 ipcMain.on("register", (event, args) => {
-    console.log("register event raised");
-    console.log(event);
+    helper.registerUser(args);
 })
 
 app.whenReady().then(createWindow);
