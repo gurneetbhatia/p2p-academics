@@ -1,11 +1,11 @@
 const path = require('path');
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const isDev = require("electron-is-dev");
 const { MongoClient } = require('mongodb');
 
 const helper = require('./helper');
 
-const isInitialised = helper.checkIfInitialised();
+// const isInitialised = helper.checkIfInitialised();
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(dbUri, {
@@ -38,6 +38,11 @@ function createWindow() {
         win.webContents.openDevTools({mode: "detach"});
     }
 }
+
+ipcMain.on("register", (event, args) => {
+    console.log("register event raised");
+    console.log(event);
+})
 
 app.whenReady().then(createWindow);
 

@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import './register.css';
 
+
 class RegisterPage extends React.Component {
     constructor(props) {
         super(props);
@@ -18,8 +19,7 @@ class RegisterPage extends React.Component {
     }
 
     handleSubmit(event) {
-        console.log(this.state.value);
-        event.preventDefault();
+        window.api.send("register", this.state.value);
     }
 
     render() {
