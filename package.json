@@ -11,6 +11,7 @@
     "electron-is-dev": "^2.0.0",
     "holder": "^0.0.0",
     "holderjs": "^2.9.9",
+    "mkdirp": "^0.5.5",
     "mongodb": "^4.1.2",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.6",

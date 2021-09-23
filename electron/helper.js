@@ -1,5 +1,7 @@
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
+const mkdirp = require('mkdirp');
+const getDirName = require('path').dirname;
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(dbUri, {
@@ -26,14 +28,21 @@ function checkIfInitialised() {
 }
 
 function registerUser(data) {
-    let content = {
+    let content = JSON.stringify({
         name: data.name,
         email: data.email,
         knowledgeDomains: []
-    };
-    const filepath = '~/p2p/user/meta.txt';
+    });
+    const filepath = './user/meta.txt';
+    mkdirp(getDirName(filepath), (err) => {
+        console.log(err);
+    })
     fs.writeFile(filepath, content, (err) => {
-        return console.log(err);
+        mkdirp(getDirName(filepath), (err) => {
+            console.log(err);
+        });
+
+        fs.writeFileSync(filepath, content);
     });
     console.log("User file saved locally");
 }
