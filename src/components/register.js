@@ -82,19 +82,3 @@ class RegisterPage extends React.Component {
 }
 
 export default RegisterPage
-
-
-{/* <Carousel.Item interval={null}>
-                        <img
-                            id="carousel-img"
-                            className="d-block w-100"
-                            src={"https://via.placeholder.com/"+window.innerWidth+"x"+window.innerHeight+".png/252728/FFFFFF?text=Register by entering your name"}
-                            alt=""/>
-                        <Carousel.Caption>
-                            <Form>
-                                <Form.Group className="mb-3" controlId="name">
-                                    <Form.Label></Form.Label>
-                                </Form.Group>
-                            </Form>
-                        </Carousel.Caption>
-                    </Carousel.Item> */}
