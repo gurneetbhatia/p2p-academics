@@ -1,9 +1,10 @@
 import React from 'react';
+import './home.css';
 
 class HomePage extends React.Component {
     render() {
         return (
-            <div>Home page</div>
+            <div className="home-container" height={window.innerHeight.toString()}>Home page</div>
         );
     }
 }
