@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
+const { contextBridge, ipcRenderer } = require('electron');
 const mkdirp = require('mkdirp');
 const getDirName = require('path').dirname;
 
@@ -16,7 +17,7 @@ const client = new MongoClient(dbUri, {
 // })
 
 function checkIfInitialised() {
-    const dir = '~/p2p/user/meta';
+    const dir = './user/meta.txt';
 
     if (fs.existsSync(dir)) {
         console.log('Initialised');
@@ -27,27 +28,6 @@ function checkIfInitialised() {
     }
 }
 
-function registerUser(data) {
-    let content = JSON.stringify({
-        name: data.name,
-        email: data.email,
-        knowledgeDomains: []
-    });
-    const filepath = './user/meta.txt';
-    mkdirp(getDirName(filepath), (err) => {
-        console.log(err);
-    })
-    fs.writeFile(filepath, content, (err) => {
-        mkdirp(getDirName(filepath), (err) => {
-            console.log(err);
-        });
-
-        fs.writeFileSync(filepath, content);
-    });
-    console.log("User file saved locally");
-}
-
 module.exports = {
-    checkIfInitialised: checkIfInitialised,
-    registerUser: registerUser
+    checkIfInitialised: checkIfInitialised
 }

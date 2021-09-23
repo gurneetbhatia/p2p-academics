@@ -2,10 +2,14 @@ const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const isDev = require("electron-is-dev");
 const { MongoClient } = require('mongodb');
+const mkdirp = require('mkdirp');
+const getDirName = require('path').dirname;
+const fs = require('fs');
 
 const helper = require('./helper');
 
 // const isInitialised = helper.checkIfInitialised();
+const baseUrl = 'http://localhost:3000';
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(dbUri, {
@@ -18,9 +22,10 @@ const client = new MongoClient(dbUri, {
 //     client.close();
 //     console.log(collection);
 // })
+let win;
 
 function createWindow() {
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
@@ -30,7 +35,7 @@ function createWindow() {
     });
 
     const extension = helper.checkIfInitialised() ? '/' : '/register';
-    win.loadURL('http://localhost:3000' + extension);
+    win.loadURL(baseUrl + extension);
     // win.loadURL(`file://${path.join(__dirname, "../public/index.html")}`);
     // win.loadFile('index.html');
 
@@ -39,9 +44,34 @@ function createWindow() {
     }
 }
 
+function registerUser(data) {
+    let content = JSON.stringify({
+        name: data.name,
+        email: data.email,
+        knowledgeDomains: []
+    });
+    const filepath = './user/meta.txt';
+    mkdirp(getDirName(filepath), (err) => {
+        console.log(err);
+    })
+    fs.writeFile(filepath, content, (err) => {
+        mkdirp(getDirName(filepath), (err) => {
+            console.log(err);
+        });
+
+        fs.writeFileSync(filepath, content);
+    });
+    console.log("User file saved locally");
+    win.loadURL(baseUrl + '/');
+}
+
 ipcMain.on("register", (event, args) => {
-    helper.registerUser(args);
-})
+    registerUser(args);
+});
+
+ipcMain.on("navigate-to", (path) => {
+    win.loadUrl(baseUrl + path);
+});
 
 app.whenReady().then(createWindow);
 

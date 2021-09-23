@@ -5,7 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, data) => {
-            const validChannels = ["register"];
+            const validChannels = ["register", "navigate-to"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
