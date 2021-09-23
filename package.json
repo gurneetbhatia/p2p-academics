@@ -21,7 +21,7 @@
   },
   "scripts": {
     "dev": "concurrently -k \"BROWSER=none npm start\" \"npm:electron-b\"",
-    "electron-b": "wait-on tcp:3000 && electron .",
+    "electron-b": "wait-on tcp:3000 && electron --trace-warnings .",
     "electron-start": "electron .",
     "start": "react-scripts start",
     "build": "react-scripts build",

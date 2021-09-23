@@ -1,28 +1,13 @@
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
-const fs = require('fs');
 
 const isDev = require("electron-is-dev");
-const { MongoClient } = require('mongodb');
 
 const helper = require('./helper');
 
 // const isInitialised = helper.checkIfInitialised();
 
-const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(dbUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-// client.connect(err => {
-//     const collection = client.db("test").collection("devices");
-//     client.close();
-//     console.log(collection);
-// })
-
 function createWindow() {
-    const isInitialised = checkIfInitialised();
 
     const win = new BrowserWindow({
         width: 800,

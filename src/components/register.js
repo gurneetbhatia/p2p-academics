@@ -24,8 +24,8 @@ class RegisterPage extends React.Component {
 
     handleSubmit(event) {
         console.log(this.state);
-        window.api.send("register", this.state);
         event.preventDefault()
+        window.api.send("register", this.state);
     }
 
     render() {

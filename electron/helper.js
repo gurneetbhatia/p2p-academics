@@ -14,7 +14,7 @@ const client = new MongoClient(dbUri, {
 // })
 
 function checkIfInitialised() {
-    const dir = '~/p2p/repository';
+    const dir = '~/p2p/user/meta';
 
     if (fs.existsSync(dir)) {
         console.log('Initialised');
@@ -31,7 +31,7 @@ function registerUser(data) {
         email: data.email,
         knowledgeDomains: []
     };
-    const filepath = '~/p2p/user/meta';
+    const filepath = '~/p2p/user/meta.txt';
     fs.writeFile(filepath, content, (err) => {
         return console.log(err);
     });
