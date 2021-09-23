@@ -1,5 +1,7 @@
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
+
 const isDev = require("electron-is-dev");
 const { MongoClient } = require('mongodb');
 
@@ -20,6 +22,8 @@ const client = new MongoClient(dbUri, {
 // })
 
 function createWindow() {
+    const isInitialised = checkIfInitialised();
+
     const win = new BrowserWindow({
         width: 800,
         height: 600,
