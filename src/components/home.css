@@ -11,6 +11,14 @@
     font-size: 30px;
 }
 
+.sidebar a {
+    color: #c0c0c0;
+}
+
+.sidebar a:hover {
+    color: #c0c0c0;
+}
+
 #sidebar-wrapper {
     min-height: 100vh !important;
     width: 100vw;
