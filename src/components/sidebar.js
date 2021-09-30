@@ -12,32 +12,32 @@ class Sidebar extends React.Component {
                 <div className="sidebar-sticky"></div>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Run Query</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faQuestionCircle}/></Nav.Link>
+                        <Nav.Link href='/query'><FontAwesomeIcon icon={faQuestionCircle}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>My Repository</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faBook}/></Nav.Link>
+                        <Nav.Link href='/repository'><FontAwesomeIcon icon={faBook}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Explore Repositories</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faCompass}/></Nav.Link>
+                        <Nav.Link href='/explore'><FontAwesomeIcon icon={faCompass}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Find people</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faUserFriends}/></Nav.Link>
+                        <Nav.Link href='/find-people'><FontAwesomeIcon icon={faUserFriends}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Chats</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faComment}/></Nav.Link>
+                        <Nav.Link href='/chats'><FontAwesomeIcon icon={faComment}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
                 <Nav.Item>
                     <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Settings</Tooltip>}>
-                        <Nav.Link href='/'><FontAwesomeIcon icon={faCog}/></Nav.Link>
+                        <Nav.Link href='/settings'><FontAwesomeIcon icon={faCog}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
             </Nav>
