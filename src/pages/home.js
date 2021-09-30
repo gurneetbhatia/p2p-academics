@@ -1,14 +1,14 @@
 import React from 'react';
 import './home.css';
-import Sidebar from './sidebar';
+import Sidebar from '../components/sidebar';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Switch, Route } from 'react-router-dom';
-import QueryPage from '../pages/query-page';
-import RepositoryPage from '../pages/repository-page';
-import ExplorePage from '../pages/explore-page';
-import FindPeoplePage from '../pages/find-people-page';
-import ChatsPage from '../pages/chats-page';
-import SettingsPage from '../pages/settings-page';
+import QueryPage from './query-page';
+import RepositoryPage from './repository-page';
+import ExplorePage from './explore-page';
+import FindPeoplePage from './find-people-page';
+import ChatsPage from './chats-page';
+import SettingsPage from './settings-page';
 
 class HomePage extends React.Component {
     render() {

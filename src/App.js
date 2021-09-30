@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import RegisterPage from './components/register';
-import HomePage from './components/home';
+import HomePage from './pages/home';
 
 class App extends React.Component {
   render () {
