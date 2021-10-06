@@ -73,6 +73,11 @@ ipcMain.on("navigate-to", (path) => {
     win.loadUrl(baseUrl + path);
 });
 
+ipcMain.on("get-repo-resources", (event, args) => {
+    // event.reply("return-repo-resources", "test response");
+    win.webContents.send("return-repo-resources", helper.getRepositoryResources());
+})
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
@@ -84,3 +89,5 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+helper.getRepositoryResources();

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
 const { contextBridge, ipcRenderer } = require('electron');
+const path = require('path');
 const mkdirp = require('mkdirp');
 const getDirName = require('path').dirname;
 
@@ -28,6 +29,18 @@ function checkIfInitialised() {
     }
 }
 
+function getRepositoryResources() {
+    const directoryPath = __dirname + '/../Repository';
+    fs.readdir(directoryPath, (err, files) => {
+        if (err) {
+            return console.log("Unable to scan directory: " + err)
+        }
+
+        return files;
+    })
+}
+
 module.exports = {
-    checkIfInitialised: checkIfInitialised
+    checkIfInitialised: checkIfInitialised,
+    getRepositoryResources: getRepositoryResources
 }
