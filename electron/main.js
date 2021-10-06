@@ -90,4 +90,4 @@ app.on('activate', () => {
     }
 });
 
-helper.getRepositoryResources();
+// helper.getRepositoryResources();
