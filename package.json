@@ -11,6 +11,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "bootstrap": "^5.1.1",
+    "bufferutil": "^4.0.4",
     "electron-is-dev": "^2.0.0",
     "holder": "^0.0.0",
     "holderjs": "^2.9.9",
@@ -22,6 +23,7 @@
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "socket.io": "^4.2.0",
+    "utf-8-validate": "^5.0.6",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

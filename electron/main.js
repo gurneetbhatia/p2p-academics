@@ -5,6 +5,18 @@ const { MongoClient } = require('mongodb');
 const mkdirp = require('mkdirp');
 const getDirName = require('path').dirname;
 const fs = require('fs');
+const io = require("socket.io")();
+
+io.attach(8080, {
+    pingInterval: 10000,
+    pingTimeout: 5000,
+    cookie: false
+});
+
+io.on('connection', (socket) => {
+    console.log("connection detected");
+    console.log(socket);
+})
 
 const helper = require('./helper');
 
