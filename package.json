@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^12.8.3",
     "bootstrap": "^5.1.1",
     "bufferutil": "^4.0.4",
+    "crypto": "^1.0.1",
     "electron-is-dev": "^2.0.0",
     "holder": "^0.0.0",
     "holderjs": "^2.9.9",

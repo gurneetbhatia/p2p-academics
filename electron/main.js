@@ -6,28 +6,41 @@ const mkdirp = require('mkdirp');
 const getDirName = require('path').dirname;
 const fs = require('fs');
 const io = require("socket.io")();
-
-io.attach(8080, {
-    pingInterval: 10000,
-    pingTimeout: 5000,
-    cookie: false
-});
-
-io.on('connection', (socket) => {
-    console.log("connection detected");
-    console.log(socket);
-})
-
 const helper = require('./helper');
+
+
+async function initialiseServer() {
+    await helper.connectToMongo();
+    const socketServerUID = helper.generateServerUID();
+    helper.reserveServerUID(socketServerUID);
+}
+initialiseServer();
+
+/*.then((serverUID) => {
+    console.log("SERVER UID IS: " + serverUID);
+    io.attach(8080, {
+        pingInterval: 10000,
+        pingTimeout: 5000,
+        cookie: false,
+        path: '/socket.io/sockets/' + serverUID
+    });
+
+    io.on('connection', (socket) => {
+        console.log("connection detected");
+        console.log(socket);
+    })
+})*/
+
+// console.log("SERVER UID IS: " + helper.getNextAvailableServerUID());
 
 // const isInitialised = helper.checkIfInitialised();
 const baseUrl = 'http://localhost:3000';
 
-const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(dbUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+// const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+// const client = new MongoClient(dbUri, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
 
 // client.connect(err => {
 //     const collection = client.db("test").collection("devices");
