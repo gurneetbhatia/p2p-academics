@@ -6,13 +6,38 @@ const mkdirp = require('mkdirp');
 const getDirName = require('path').dirname;
 const fs = require('fs');
 const io = require("socket.io")();
+const socketClient = require("socket.io-client");
 const helper = require('./helper');
 
+let socketServers = []
 
 async function initialiseServer() {
     await helper.connectToMongo();
     const socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
+    io.attach(8080, {
+        pingInterval: 10000,
+        pingTimeout: 5000,
+        cookie: false,
+        path: '/socket.io/sockets/' + socketServerUID
+    });
+
+    io.on('connection', (socket) => {
+        console.log("client connection detected");
+        console.log(socket);
+    });
+
+    // now connect to all other active servers
+    activeServers = helper.fetchActiveServers();
+    activeServers.array.forEach(element => {
+        if (element.serverUID != socketServerUID) {
+            const newSocket = socketClient("http://localhost:8080", {
+                reconnectionDelayMax: 10000,
+                path: '/socket.io/sockets/' + element.serverUID
+            });
+            socketServers.push(newSocket);
+        }
+    });
 }
 initialiseServer();
 

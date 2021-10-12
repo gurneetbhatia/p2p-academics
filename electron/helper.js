@@ -88,10 +88,16 @@ function reserveServerUID(serverUID) {
     db.collection("active-servers").insertOne({serverUID: serverUID, offVotes: []});
 }
 
+function fetchActiveServers() {
+    const db = client.db("desktop-app");
+    db.collection("active-servers").find({});
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
     generateServerUID: generateServerUID,
     reserveServerUID: reserveServerUID,
-    connectToMongo: connectToMongo
+    connectToMongo: connectToMongo,
+    fetchActiveServers: fetchActiveServers
 }
