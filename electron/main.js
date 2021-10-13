@@ -11,6 +11,11 @@ const helper = require('./helper');
 
 let socketServers = []
 
+/**
+ * Note to self: Upon starting the application, also update the database
+ * to correctly reflect the resources available on this device for the network.
+ */
+
 async function initialiseServer() {
     await helper.connectToMongo();
     const socketServerUID = helper.generateServerUID();
@@ -27,17 +32,32 @@ async function initialiseServer() {
         console.log(socket);
     });
 
+    io.on('get-resource-list', (socket) => {
+        // continue working from here
+        /**
+         * Call the helper function to fetch details of all available resources
+         * from the repository
+         * Then return these to the user
+         */
+    })
+
     // now connect to all other active servers
     activeServers = helper.fetchActiveServers();
-    activeServers.array.forEach(element => {
-        if (element.serverUID != socketServerUID) {
-            const newSocket = socketClient("http://localhost:8080", {
-                reconnectionDelayMax: 10000,
-                path: '/socket.io/sockets/' + element.serverUID
-            });
-            socketServers.push(newSocket);
-        }
-    });
+    activeServers.toArray((err, documents) => {
+        if (err) throw err;
+        documents.forEach(element => {
+            if (element.serverUID != socketServerUID) {
+                const newSocket = socketClient("http://localhost:8000", {
+                    reconnectionDelayMax: 10000,
+                    path: '/socket.io/sockets/' + element.serverUID
+                });
+                console.log("Connected to " + element.serverUID);
+                socketServers.push(newSocket);
+            }
+        });
+    })
+    console.log(activeServers);
+    console.log(activeServers.array);
 }
 initialiseServer();
 
