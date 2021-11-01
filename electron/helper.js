@@ -51,11 +51,30 @@ function reserveServerUID(serverUID) {
 function fetchActiveServers() {
     const db = client.db("desktop-app");
     return db.collection("active-servers").find()
-    // return findResult.toArray((err, result) => {
-    //     console.log(err);
-    //     console.log(result);
-    // })
-    // return db.collection("active-servers").find();
+}
+
+function updateResourcesList(serverUID) {
+    const db = client.db("desktop-app");
+    fs.readdir(__dirname + '/../Repository', (err, files) => {
+        if (err) {
+            console.log("Unable to scan directory: " + err);
+        }
+        const rescourcesCollection = db.collection("resources");
+        files.forEach((file) => {
+            rescourcesCollection.insertOne({serverUID: serverUID, filename: file, knowledgeDomains: [], author: 'some author'});
+        })
+    });
+}
+
+function closeApplication(serverUID) {
+    console.log("CLOSING APPLICATION [HELPER]")
+    // from active-servers, remove the instance where the serverUID matches
+    // from resources, take down all objects where the serverUID matches
+    const db = client.db("desktop-app");
+    const serversCollection = db.collection("active-servers");
+    const resourcesCollection = db.collection("resources");
+    serversCollection.deleteOne({serverUID: serverUID});
+    resourcesCollection.deleteMany({serverUID: serverUID});
 }
 
 module.exports = {
@@ -64,5 +83,7 @@ module.exports = {
     generateServerUID: generateServerUID,
     reserveServerUID: reserveServerUID,
     connectToMongo: connectToMongo,
-    fetchActiveServers: fetchActiveServers
+    fetchActiveServers: fetchActiveServers,
+    updateResourcesList: updateResourcesList,
+    closeApplication: closeApplication
 }

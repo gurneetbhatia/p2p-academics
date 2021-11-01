@@ -11,14 +11,11 @@ const helper = require('./helper');
 
 let socketServers = []
 
-/**
- * Note to self: Upon starting the application, also update the database
- * to correctly reflect the resources available on this device for the network.
- */
+let socketServerUID;
 
 async function initialiseServer() {
     await helper.connectToMongo();
-    const socketServerUID = helper.generateServerUID();
+    socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
     io.attach(8080, {
         pingInterval: 10000,
@@ -32,14 +29,20 @@ async function initialiseServer() {
         console.log(socket);
     });
 
-    io.on('get-resource-list', (socket) => {
-        // continue working from here
-        /**
-         * Call the helper function to fetch details of all available resources
-         * from the repository
-         * Then return these to the user
-         */
-    })
+    /**
+     * Note to self: Upon starting the application, also update the database
+     * to correctly reflect the resources available on this device for the network.
+     */
+    helper.updateResourcesList(socketServerUID);
+
+    // io.on('update-resource-list', (socket) => {
+    //     /**
+    //      * Call the helper function to fetch details of all available resources
+    //      * from the repository
+    //      * Then update the database with these
+    //      */
+    //     helper.updateResourceList();
+    // })
 
     // now connect to all other active servers
     activeServers = helper.fetchActiveServers();
@@ -61,37 +64,8 @@ async function initialiseServer() {
 }
 initialiseServer();
 
-/*.then((serverUID) => {
-    console.log("SERVER UID IS: " + serverUID);
-    io.attach(8080, {
-        pingInterval: 10000,
-        pingTimeout: 5000,
-        cookie: false,
-        path: '/socket.io/sockets/' + serverUID
-    });
-
-    io.on('connection', (socket) => {
-        console.log("connection detected");
-        console.log(socket);
-    })
-})*/
-
-// console.log("SERVER UID IS: " + helper.getNextAvailableServerUID());
-
-// const isInitialised = helper.checkIfInitialised();
 const baseUrl = 'http://localhost:3000';
 
-// const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-// const client = new MongoClient(dbUri, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
-
-// client.connect(err => {
-//     const collection = client.db("test").collection("devices");
-//     client.close();
-//     console.log(collection);
-// })
 let win;
 
 function createWindow() {
@@ -151,6 +125,9 @@ ipcMain.on("get-repo-resources", (event, args) => {
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
+    console.log("CLOSING APPLICATION [MAIN]");
+    helper.closeApplication(socketServerUID);
+
     if (process.platform !== 'darwin') app.quit()
 });
 
