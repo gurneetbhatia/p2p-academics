@@ -2,6 +2,9 @@
   "name": "desktop-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  },
   "main": "electron/main.js",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
@@ -15,6 +18,8 @@
     "bufferutil": "^4.0.4",
     "crypto": "^1.0.1",
     "electron-is-dev": "^2.0.0",
+    "ffmetadata": "^1.7.0",
+    "file-metadata": "^3.0.0",
     "holder": "^0.0.0",
     "holderjs": "^2.9.9",
     "mkdirp": "^0.5.5",

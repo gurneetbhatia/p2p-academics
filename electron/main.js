@@ -118,8 +118,10 @@ ipcMain.on("navigate-to", (path) => {
 });
 
 ipcMain.on("get-repo-resources", (event, args) => {
+    console.log("GETTING REPO RESOURCES [MAIN]");
+    event.reply("return-repo-resources", helper.getRepositoryResources())
     // event.reply("return-repo-resources", "test response");
-    win.webContents.send("return-repo-resources", helper.getRepositoryResources());
+    //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
 })
 
 app.whenReady().then(createWindow);

@@ -28,13 +28,15 @@ function checkIfInitialised() {
 
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
-    fs.readdir(directoryPath, (err, files) => {
-        if (err) {
-            return console.log("Unable to scan directory: " + err)
-        }
+    const filenames = fs.readdirSync(directoryPath);
+    // var fileObjs = [];
+    // filenames.forEach((filename) => {
+    //     const fileObj = fileMetaDataSync(directoryPath + '/' + filename);
+    //     console.log(fileObj);
+    //     fileObjs.push(fileObj);
+    // });
 
-        return files;
-    })
+    return filenames;
 }
 
 function generateServerUID() {

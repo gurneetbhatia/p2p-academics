@@ -3,7 +3,8 @@ import ResourceCard from '../components/ResourceCard'
 
 
 window.api.receive("return-repo-resources", (response) => {
-    console.log("handle response here")
+    console.log("handle response here");
+    console.log(response);
 });
 
 window.api.send("get-repo-resources", {});
