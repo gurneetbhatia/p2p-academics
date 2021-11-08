@@ -1,8 +1,10 @@
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
+
+global.uploadFilesPath = undefined;
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/desktop-app?retryWrites=true&w=majority";
 let client;
@@ -79,6 +81,31 @@ function closeApplication(serverUID) {
     resourcesCollection.deleteMany({serverUID: serverUID});
 }
 
+function handleUploadFilesClick() {
+    console.log("Upload file clicked [HELPER]");
+    // const properties = process.platform === 'darwin' ? ['openFile', 'openDirectory'] : ['multiSelections'];
+    dialog.showOpenDialog({
+        title: 'Select the file to be uploaded',
+        defaultPath: '~/',
+        buttonLabel: 'Upload',
+        filters: [
+            {
+                name: 'PDF Files',
+                extensions: ['pdf']
+            }
+        ],
+        properties: ['multiSelections']
+    }).then(files => {
+        console.log(files.canceled);
+        if (!files.canceled) {
+            global.filesUploadPath = files.filePaths;
+            console.log(global.filesUploadPath);
+        }
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -87,5 +114,6 @@ module.exports = {
     connectToMongo: connectToMongo,
     fetchActiveServers: fetchActiveServers,
     updateResourcesList: updateResourcesList,
-    closeApplication: closeApplication
+    closeApplication: closeApplication,
+    handleUploadFilesClick: handleUploadFilesClick
 }

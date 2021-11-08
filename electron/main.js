@@ -122,6 +122,11 @@ ipcMain.on("get-repo-resources", (event, args) => {
     event.reply("return-repo-resources", helper.getRepositoryResources())
     // event.reply("return-repo-resources", "test response");
     //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
+});
+
+ipcMain.on("upload-files-click", (event, args) => {
+    console.log("Upload files clicked [MAIN]");
+    helper.handleUploadFilesClick();
 })
 
 app.whenReady().then(createWindow);

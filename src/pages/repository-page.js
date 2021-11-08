@@ -28,9 +28,14 @@ let resourcesList = [
 ]
 
 class RepositoryPage extends React.Component {
+    uploadFileClicked() {
+        window.api.send("upload-files-click");
+    }
+
     render() {
         return (
             <div>
+                <button id="upload-file" onClick={this.uploadFileClicked}>Upload Resources</button>
                 {
                     resourcesList.map((element, index) => {
                         return <ResourceCard key={index} title={element.title} abstract={element.abstract} authors={element.authors}></ResourceCard>
