@@ -4,8 +4,6 @@ const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 
-global.uploadFilesPath = undefined;
-
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/desktop-app?retryWrites=true&w=majority";
 let client;
 async function connectToMongo() {
@@ -98,11 +96,24 @@ function handleUploadFilesClick() {
     }).then(files => {
         console.log(files.canceled);
         if (!files.canceled) {
-            global.filesUploadPath = files.filePaths;
-            console.log(global.filesUploadPath);
+            // global.filesUploadPath = files.filePaths;
+            console.log(files.filePaths);
+            // upload files to the application Repository directory
+            copyFilesToRepo(files.filePaths);
         }
     }).catch(err => {
         console.log(err);
+    });
+}
+
+function copyFilesToRepo(filepaths) {
+    const directoryPath = __dirname + '/../Repository/';
+    filepaths.forEach(filepath => {
+        const filename = path.basename(filepath);
+        fs.copyFile(filepath, directoryPath + filename, (err) => {
+            if (err) throw err;
+            console.log(err);
+        });
     });
 }
 
