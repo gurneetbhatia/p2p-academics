@@ -9,7 +9,8 @@ window.api.receive("return-repo-resources", (response) => {
             const rescObj = {
                 title: element,
                 abstract: "some abstract that will be replaced here",
-                authors: ["author 1", "author 2"]
+                authors: ["author 1", "author 2"],
+                knowledgeDomains: []
             };
             resourcesList.push(rescObj);
         });
