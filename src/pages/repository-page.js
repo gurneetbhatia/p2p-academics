@@ -1,31 +1,39 @@
 import React from 'react';
 import ResourceCard from '../components/ResourceCard'
 
-
+let resourcesList = [];
 window.api.receive("return-repo-resources", (response) => {
-    console.log("handle response here");
-    console.log(response);
+    if (response) {
+        response.forEach(element => {
+            const rescObj = {
+                title: element,
+                abstract: "some abstract that will be replaced here",
+                authors: ["author 1", "author 2"]
+            };
+            resourcesList.push(rescObj);
+        });
+    }
 });
 
 window.api.send("get-repo-resources", {});
 // console.log(resourcesList);
-let resourcesList = [
-    {
-        title: "title 1",
-        abstract: "abstract 1",
-        authors: ["author 1", "author 2"]
-    },
-    {
-        title: "title 2",
-        abstract: "abstract 1",
-        authors: ["author 1", "author 2"]
-    },
-    {
-        title: "title 3",
-        abstract: "abstract 1",
-        authors: ["author 1", "author 2"]
-    },
-]
+// let resourcesList = [
+//     {
+//         title: "title 1",
+//         abstract: "abstract 1",
+//         authors: ["author 1", "author 2"]
+//     },
+//     {
+//         title: "title 2",
+//         abstract: "abstract 1",
+//         authors: ["author 1", "author 2"]
+//     },
+//     {
+//         title: "title 3",
+//         abstract: "abstract 1",
+//         authors: ["author 1", "author 2"]
+//     },
+// ]
 
 class RepositoryPage extends React.Component {
     uploadFileClicked() {
