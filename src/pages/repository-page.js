@@ -36,7 +36,7 @@ class RepositoryPage extends React.Component {
                 {/* <button id="upload-file" onClick={this.uploadFileClicked}>Upload Resources</button> */}
                 {
                     resourcesList.map((element, index) => {
-                        return <ResourceCard key={index} title={element.title} abstract={element.abstract} authors={element.authors}></ResourceCard>
+                        return <ResourceCard key={index} filename={element.filename} title={element.title} abstract={element.abstract} authors={element.authors}></ResourceCard>
                     })
                 }
                 {/* <ResourceCard title="some text" abstract="some abstract" authors={["name 1", "name 2"]}></ResourceCard> */}

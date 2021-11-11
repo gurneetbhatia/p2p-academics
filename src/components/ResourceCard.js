@@ -5,6 +5,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 class ResourceCard extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleDelete = this.handleDelete.bind(this);
+    }
+
+    
+
+    handleDelete() {
+        window.api.send("delete-resource", this.props.filename);
+    }
+
     render() {
         return (
             <Card bg="secondary" key={0} text="white" style={{width: '18rem'}} className="mb-2">
@@ -14,7 +25,7 @@ class ResourceCard extends React.Component {
                     <Card.Text>{this.props.abstract}</Card.Text>
                     <Card.Footer>
                         <Button variant="info"><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
-                        <Button variant="danger"><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
+                        <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
                     </Card.Footer>
                 </Card.Body>
             </Card>
