@@ -132,6 +132,7 @@ ipcMain.on("upload-files-click", (event, args) => {
 ipcMain.on("delete-resource", (event, args) => {
     console.log("Deleting resource [MAIN]");
     console.log(args);
+    helper.deleteResource(args);
 })
 
 app.whenReady().then(createWindow);

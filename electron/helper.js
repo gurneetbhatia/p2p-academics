@@ -117,6 +117,11 @@ function copyFilesToRepo(filepaths) {
     });
 }
 
+function deleteResource(filename) {
+    const directoryPath = __dirname + '/../Repository/';
+    fs.unlinkSync(directoryPath + filename);
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -126,5 +131,6 @@ module.exports = {
     fetchActiveServers: fetchActiveServers,
     updateResourcesList: updateResourcesList,
     closeApplication: closeApplication,
-    handleUploadFilesClick: handleUploadFilesClick
+    handleUploadFilesClick: handleUploadFilesClick,
+    deleteResource: deleteResource
 }
