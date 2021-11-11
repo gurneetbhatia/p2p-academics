@@ -119,7 +119,7 @@ ipcMain.on("navigate-to", (path) => {
 
 ipcMain.on("get-repo-resources", (event, args) => {
     console.log("GETTING REPO RESOURCES [MAIN]");
-    event.reply("return-repo-resources", helper.getRepositoryResources())
+    event.reply("return-repo-resources", helper.getRepositoryResources());
     // event.reply("return-repo-resources", "test response");
     //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
 });
@@ -127,6 +127,11 @@ ipcMain.on("get-repo-resources", (event, args) => {
 ipcMain.on("upload-files-click", (event, args) => {
     console.log("Upload files clicked [MAIN]");
     helper.handleUploadFilesClick();
+});
+
+ipcMain.on("delete-resource", (event, args) => {
+    console.log("Deleting resource [MAIN]");
+    console.log(args);
 })
 
 app.whenReady().then(createWindow);

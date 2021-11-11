@@ -4,16 +4,20 @@ import ResourceCard from '../components/ResourceCard';
 
 let resourcesList = [];
 window.api.receive("return-repo-resources", (response) => {
+    console.log("[REACT repository-page]")
+    console.log(response);
     if (response) {
         response.forEach(element => {
             const rescObj = {
-                title: element,
+                filename: element,
+                title: 'title ' + element,
                 abstract: "some abstract that will be replaced here",
                 authors: ["author 1", "author 2"],
                 knowledgeDomains: []
             };
             resourcesList.push(rescObj);
         });
+        console.log(resourcesList);
     }
 });
 
@@ -27,6 +31,7 @@ class RepositoryPage extends React.Component {
     render() {
         return (
             <div>
+                {/* {document.write(resourcesList)} */}
                 <Button onClick={this.uploadFileClicked}>Upload Resources</Button>
                 {/* <button id="upload-file" onClick={this.uploadFileClicked}>Upload Resources</button> */}
                 {
