@@ -7,17 +7,7 @@ window.api.receive("return-repo-resources", (response) => {
     console.log("[REACT repository-page]")
     console.log(response);
     if (response) {
-        response.forEach(element => {
-            const rescObj = {
-                filename: element,
-                title: 'title ' + element,
-                abstract: "some abstract that will be replaced here",
-                authors: ["author 1", "author 2"],
-                knowledgeDomains: []
-            };
-            resourcesList.push(rescObj);
-        });
-        console.log(resourcesList);
+        resourcesList = response;
     }
 });
 
@@ -46,3 +36,7 @@ class RepositoryPage extends React.Component {
 }
 
 export default RepositoryPage;
+
+/**
+ * NEED TO UPDATE THE VIEW AFTER THE DELETE ACTION
+ */

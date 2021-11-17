@@ -1,0 +1,15 @@
+[
+    {
+        "filename": "SomeFile.pdf",
+        "title": "Some Title",
+        "abstract": "some abstract",
+        "authors": [
+            "Some Author 1",
+            "Some Author 2"
+        ],
+        "knowledgeDomains": [
+            "Network Architecture",
+            "Machine Learning"
+        ]
+    }
+]

@@ -29,14 +29,34 @@ function checkIfInitialised() {
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
-    // var fileObjs = [];
-    // filenames.forEach((filename) => {
-    //     const fileObj = fileMetaDataSync(directoryPath + '/' + filename);
-    //     console.log(fileObj);
-    //     fileObjs.push(fileObj);
-    // });
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + '/meta.json'));
+    console.log(filesMeta);
+    let fileObjs = [];
+    filenames.forEach((filename) => {
+        if (filename !== "meta.json") {
+            // check if the filename exists in filenames
+            let metaObj;
+            filesMeta.some((element) => {
+                console.log(element.filename);
+                if (element.filename === filename) {
+                    metaObj = element
+                    return true;
+                } else {
+                    metaObj =  {
+                        filename: filename,
+                        title: undefined,
+                        abstract: undefined,
+                        authors: undefined,
+                        knowledgeDomains: undefined
+                    };
+                    return false;
+                }
+            });
+            fileObjs.push(metaObj);
+        }
+    })
 
-    return filenames;
+    return fileObjs;
 }
 
 function generateServerUID() {

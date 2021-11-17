@@ -21,8 +21,8 @@ class ResourceCard extends React.Component {
             <Card bg="secondary" key={0} text="white" style={{width: '18rem'}} className="mb-2">
                 {/* <Card.Header>Repository title</Card.Header> */}
                 <Card.Body>
-                    <Card.Title>{this.props.title}</Card.Title>
-                    <Card.Text>{this.props.abstract}</Card.Text>
+                    <Card.Title>{this.props.title ? this.props.title : this.props.filename}</Card.Title>
+                    <Card.Text>{this.props.abstract ? this.props.abstract : "Please complete the details for this resource."}</Card.Text>
                     <Card.Footer>
                         <Button variant="info"><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
                         <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
