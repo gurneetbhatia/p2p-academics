@@ -10,7 +10,9 @@ class ResourceCard extends React.Component {
         this.handleDelete = this.handleDelete.bind(this);
     }
 
-    
+    launchInfoPopup() {
+        console.log("launching info popup")
+    }
 
     handleDelete() {
         window.api.send("delete-resource", this.props.filename);
@@ -24,7 +26,7 @@ class ResourceCard extends React.Component {
                     <Card.Title>{this.props.title ? this.props.title : this.props.filename}</Card.Title>
                     <Card.Text>{this.props.abstract ? this.props.abstract : "Please complete the details for this resource (Click on the info icon below)."}</Card.Text>
                     <Card.Footer>
-                        <Button variant="info"><FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon></Button>
+                        <Button variant="info" onClick={this.launchInfoPopup}><FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon></Button>
                         <Button variant="info"><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
                         <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
                     </Card.Footer>
