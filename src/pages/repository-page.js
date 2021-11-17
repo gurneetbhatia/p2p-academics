@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
-import ResourceCard from '../components/ResourceCard';
+import ResourceCard from '../components/resource-card';
 
 let resourcesList = [];
 window.api.receive("return-repo-resources", (response) => {
