@@ -3,7 +3,14 @@ const { contextBridge, ipcRenderer, dialog } = require('electron');
 contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, data) => {
-            const validChannels = ["register", "navigate-to", "get-repo-resources", "upload-files-click", "delete-resource"];
+            const validChannels = [
+                "register",
+                "navigate-to",
+                "get-repo-resources",
+                "upload-files-click",
+                "delete-resource",
+                "update-resource"
+            ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
