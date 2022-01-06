@@ -133,7 +133,12 @@ ipcMain.on("delete-resource", (event, args) => {
     console.log("Deleting resource [MAIN]");
     console.log(args);
     helper.deleteResource(args);
-})
+});
+
+ipcMain.on("update-resource", (event, args) => {
+    console.log("Inside update resource event listener [MAIN]");
+    console.log(args);
+});
 
 app.whenReady().then(createWindow);
 

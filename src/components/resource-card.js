@@ -44,15 +44,21 @@ class ResourceCard extends React.Component {
     handleInfoModalSubmit(event) {
         console.log(event);
         event.preventDefault();
+        window.api.send("update-resource", this.state);
     }
 
     handleInfoModalChange(event) {
-        if (event.target.id === 'title') {
+        if (event.target.id === "title") {
             this.setState({title: event.target.value});
         }
         else if (event.target.id === "authors") {
-            console.log(event);
-            console.log(event.target.value);
+            this.setState({authors: event.target.value});
+        }
+        else if (event.target.id === "abstract") {
+            this.setState({abstract: event.target.value});
+        }
+        else if (event.target.id === "knowledge-domains") {
+            this.setState({knowledgeDomains: event.target.value});
         }
     }
 
@@ -90,22 +96,24 @@ class ResourceCard extends React.Component {
 
                             <Form.Group controlId="authors" className="mb-3">
                                 <Form.Label>Authors</Form.Label>
-                                {
+                                <Form.Control onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter names of authors (on new lines)" value={this.state.authors}></Form.Control>
+                                {/* {
                                     this.state.authors?.map((author, index) => {
                                         return <Form.Control onChange={this.handleInfoModalChange} type="text" key={index} value={author} placeholder="Enter name of author"></Form.Control>
                                     })
-                                }
-                                <Form.Control onChange={this.handleInfoModalChange} type="text" placeholder="Enter name of author"></Form.Control>
+                                } */}
+                                {/* <Form.Control onChange={this.handleInfoModalChange} type="text" placeholder="Enter names of author"></Form.Control> */}
                             </Form.Group>
 
                             <Form.Group controlId="knowledge-domains">
                                 <Form.Label>Knowledge Domains</Form.Label>
-                                {
+                                <Form.Control onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter knowledge domains (on new lines)" value={this.state.knowledgeDomains}></Form.Control>
+                                {/* {
                                     this.state.knowledgeDomains?.map((author, index) => {
                                         return <Form.Control onChange={this.handleInfoModalChange} type="text" key={index} value={author} placeholder="Enter name of author"></Form.Control>
                                     })
-                                }
-                                <Form.Control onChange={this.handleInfoModalChange} type="text" placeholder="Enter knowledge domain"></Form.Control>
+                                } */}
+                                {/* <Form.Control onChange={this.handleInfoModalChange} type="text" placeholder="Enter knowledge domain"></Form.Control> */}
                             </Form.Group>
                             
                             <ButtonToolbar>
