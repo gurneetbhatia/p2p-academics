@@ -142,6 +142,37 @@ function deleteResource(filename) {
     fs.unlinkSync(directoryPath + filename);
 }
 
+function updateResource(fileprops) {
+    const newFileObj = {
+        filename: fileprops.filename,
+        title: fileprops.title,
+        abstract: fileprops.abstract,
+        authors: fileprops.authors,
+        knowledgeDomains: fileprops.knowledgeDomains
+    }
+    // if the filename doesn't already exist in meta.json, we initialise a new object
+    // otherwise we update the relevant object with the new properties from fileprops
+    console.log("Update Resource [HELPER]");
+    let metaFileObjects = getRepositoryResources();
+    let updatedObjects = [];
+    metaFileObjects.forEach((object) => {
+        console.log(object.filename + " " + fileprops.filename + " " + object.filename === fileprops.filename);
+        if (object.filename === fileprops.filename) {
+            updatedObjects.push(newFileObj);
+        } else {
+            updatedObjects.push(object);
+        }
+    });
+
+    const filepath = './Repository/meta.json';
+    const content = JSON.stringify(updatedObjects);
+
+    fs.writeFileSync(filepath, content);
+
+    console.log(updatedObjects);
+
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -152,5 +183,6 @@ module.exports = {
     updateResourcesList: updateResourcesList,
     closeApplication: closeApplication,
     handleUploadFilesClick: handleUploadFilesClick,
-    deleteResource: deleteResource
+    deleteResource: deleteResource,
+    updateResource: updateResource
 }
