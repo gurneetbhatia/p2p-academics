@@ -1,8 +1,16 @@
 [
     {
-        "filename": "SomeFile.pdf",
-        "title": "Some Title",
-        "abstract": "some abstract",
+        "showModal":true,
+        "filename":"AnotherFile.pdf",
+        "title":"Another title",
+        "abstract":"Another abstract",
+        "authors":"Another Author",
+        "knowledgeDomains":"Another KD"
+    },
+    {
+        "filename":"SomeFile.pdf",
+        "title":"Some Title",
+        "abstract":"some abstract",
         "authors": [
             "Some Author 1",
             "Some Author 2"
