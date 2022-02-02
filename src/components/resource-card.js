@@ -14,6 +14,7 @@ class ResourceCard extends React.Component {
         super(props);
         this.state = {
             showModal: false,
+            fileid: props.fileid,
             filename: props.filename,
             title: props.title,
             abstract: props.abstract,

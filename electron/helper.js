@@ -34,24 +34,26 @@ function getRepositoryResources() {
     let fileObjs = [];
     filenames.forEach((filename) => {
         if (filename !== "meta.json") {
-            // check if the filename exists in filenames
+            // check if the filename exists in meta.json
             let metaObj;
             filesMeta.some((element) => {
                 console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
                     return true;
-                } else {
-                    metaObj =  {
-                        filename: filename,
-                        title: undefined,
-                        abstract: undefined,
-                        authors: undefined,
-                        knowledgeDomains: undefined
-                    };
-                    return false;
                 }
             });
+            if (!metaObj) {
+                const fileid = generateServerUID();
+                metaObj =  {
+                    fileid: fileid,
+                    filename: filename,
+                    title: undefined,
+                    abstract: undefined,
+                    authors: undefined,
+                    knowledgeDomains: undefined
+                };
+            }
             fileObjs.push(metaObj);
         }
     })
@@ -77,15 +79,22 @@ function fetchActiveServers() {
 
 function updateResourcesList(serverUID) {
     const db = client.db("desktop-app");
-    fs.readdir(__dirname + '/../Repository', (err, files) => {
-        if (err) {
-            console.log("Unable to scan directory: " + err);
+    const files = getRepositoryResources();
+    const resourcesCollection = db.collection("resources");
+    files.forEach((file) => {
+        if (file && file.id) {
+            resourcesCollection.find({fileid: file.id});
         }
-        const rescourcesCollection = db.collection("resources");
-        files.forEach((file) => {
-            rescourcesCollection.insertOne({serverUID: serverUID, filename: file, knowledgeDomains: [], author: 'some author'});
-        })
     });
+    // fs.readdir(__dirname + '/../Repository', (err, files) => {
+    //     if (err) {
+    //         console.log("Unable to scan directory: " + err);
+    //     }
+    //     const rescourcesCollection = db.collection("resources");
+    //     files.forEach((file) => {
+    //         rescourcesCollection.insertOne({serverUID: serverUID, title: file.title, knowledgeDomains: [], author: 'some author'});
+    //     })
+    // });
 }
 
 function closeApplication(serverUID) {
@@ -144,6 +153,7 @@ function deleteResource(filename) {
 
 function updateResource(fileprops) {
     const newFileObj = {
+        fileid: fileprops.fileid,
         filename: fileprops.filename,
         title: fileprops.title,
         abstract: fileprops.abstract,
