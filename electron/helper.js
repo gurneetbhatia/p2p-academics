@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -29,14 +29,34 @@ function checkIfInitialised() {
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
-    // var fileObjs = [];
-    // filenames.forEach((filename) => {
-    //     const fileObj = fileMetaDataSync(directoryPath + '/' + filename);
-    //     console.log(fileObj);
-    //     fileObjs.push(fileObj);
-    // });
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + '/meta.json'));
+    console.log(filesMeta);
+    let fileObjs = [];
+    filenames.forEach((filename) => {
+        if (filename !== "meta.json") {
+            // check if the filename exists in filenames
+            let metaObj;
+            filesMeta.some((element) => {
+                console.log(element.filename);
+                if (element.filename === filename) {
+                    metaObj = element
+                    return true;
+                } else {
+                    metaObj =  {
+                        filename: filename,
+                        title: undefined,
+                        abstract: undefined,
+                        authors: undefined,
+                        knowledgeDomains: undefined
+                    };
+                    return false;
+                }
+            });
+            fileObjs.push(metaObj);
+        }
+    })
 
-    return filenames;
+    return fileObjs;
 }
 
 function generateServerUID() {
@@ -79,6 +99,80 @@ function closeApplication(serverUID) {
     resourcesCollection.deleteMany({serverUID: serverUID});
 }
 
+function handleUploadFilesClick() {
+    console.log("Upload file clicked [HELPER]");
+    // const properties = process.platform === 'darwin' ? ['openFile', 'openDirectory'] : ['multiSelections'];
+    dialog.showOpenDialog({
+        title: 'Select the file to be uploaded',
+        defaultPath: '~/',
+        buttonLabel: 'Upload',
+        filters: [
+            {
+                name: 'PDF Files',
+                extensions: ['pdf']
+            }
+        ],
+        properties: ['multiSelections']
+    }).then(files => {
+        console.log(files.canceled);
+        if (!files.canceled) {
+            // global.filesUploadPath = files.filePaths;
+            console.log(files.filePaths);
+            // upload files to the application Repository directory
+            copyFilesToRepo(files.filePaths);
+        }
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
+function copyFilesToRepo(filepaths) {
+    const directoryPath = __dirname + '/../Repository/';
+    filepaths.forEach(filepath => {
+        const filename = path.basename(filepath);
+        fs.copyFile(filepath, directoryPath + filename, (err) => {
+            if (err) throw err;
+            console.log(err);
+        });
+    });
+}
+
+function deleteResource(filename) {
+    const directoryPath = __dirname + '/../Repository/';
+    fs.unlinkSync(directoryPath + filename);
+}
+
+function updateResource(fileprops) {
+    const newFileObj = {
+        filename: fileprops.filename,
+        title: fileprops.title,
+        abstract: fileprops.abstract,
+        authors: fileprops.authors,
+        knowledgeDomains: fileprops.knowledgeDomains
+    }
+    // if the filename doesn't already exist in meta.json, we initialise a new object
+    // otherwise we update the relevant object with the new properties from fileprops
+    console.log("Update Resource [HELPER]");
+    let metaFileObjects = getRepositoryResources();
+    let updatedObjects = [];
+    metaFileObjects.forEach((object) => {
+        console.log(object.filename + " " + fileprops.filename + " " + object.filename === fileprops.filename);
+        if (object.filename === fileprops.filename) {
+            updatedObjects.push(newFileObj);
+        } else {
+            updatedObjects.push(object);
+        }
+    });
+
+    const filepath = './Repository/meta.json';
+    const content = JSON.stringify(updatedObjects);
+
+    fs.writeFileSync(filepath, content);
+
+    console.log(updatedObjects);
+
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -87,5 +181,8 @@ module.exports = {
     connectToMongo: connectToMongo,
     fetchActiveServers: fetchActiveServers,
     updateResourcesList: updateResourcesList,
-    closeApplication: closeApplication
+    closeApplication: closeApplication,
+    handleUploadFilesClick: handleUploadFilesClick,
+    deleteResource: deleteResource,
+    updateResource: updateResource
 }

@@ -1,7 +1,7 @@
 {
   "name": "desktop-app",
   "version": "0.1.0",
-  "private": true,
+  "proxy": "http://localhost:3000",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
