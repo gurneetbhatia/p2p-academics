@@ -79,13 +79,23 @@ function fetchActiveServers() {
 
 function updateResourcesList(serverUID) {
     const db = client.db("desktop-app");
-    const files = getRepositoryResources();
+    var files = getRepositoryResources();
     const resourcesCollection = db.collection("resources");
-    files.forEach((file) => {
-        if (file && file.id) {
-            resourcesCollection.find({fileid: file.id});
-        }
+    var remoteResourcesCursor = resourcesCollection.find({serverUID: serverUID});
+    remoteResourcesCursor.forEach((resc) => {
+        files = files.filter((file) => {
+            // remove any files that are already on the remote database
+            return file.fileid !== resc.fileid;
+        });
     });
+    // push the remaining files to the database
+    files.forEach((file) => {
+        file["serverUID"] = serverUID;
+        resourcesCollection.insertOne(file);
+    });
+    // files.forEach((file) => {
+    //     resourcesCollection.find({serverUID: serverUID});
+    // });
     // fs.readdir(__dirname + '/../Repository', (err, files) => {
     //     if (err) {
     //         console.log("Unable to scan directory: " + err);
