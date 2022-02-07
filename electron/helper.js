@@ -93,18 +93,6 @@ function updateResourcesList(serverUID) {
         file["serverUID"] = serverUID;
         resourcesCollection.insertOne(file);
     });
-    // files.forEach((file) => {
-    //     resourcesCollection.find({serverUID: serverUID});
-    // });
-    // fs.readdir(__dirname + '/../Repository', (err, files) => {
-    //     if (err) {
-    //         console.log("Unable to scan directory: " + err);
-    //     }
-    //     const rescourcesCollection = db.collection("resources");
-    //     files.forEach((file) => {
-    //         rescourcesCollection.insertOne({serverUID: serverUID, title: file.title, knowledgeDomains: [], author: 'some author'});
-    //     })
-    // });
 }
 
 function closeApplication(serverUID) {
@@ -191,6 +179,11 @@ function updateResource(fileprops) {
 
     console.log(updatedObjects);
 
+}
+
+function getActiveResources(serverUID) {
+    // return all resources from the database where the serverUID is not the argument provided
+    
 }
 
 module.exports = {

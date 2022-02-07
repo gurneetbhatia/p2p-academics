@@ -124,6 +124,10 @@ ipcMain.on("get-repo-resources", (event, args) => {
     //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
 });
 
+ipcMain.on("get-active-resources", (event, args) => {
+    console.log("getting remote resources [MAIN]");
+});
+
 ipcMain.on("upload-files-click", (event, args) => {
     console.log("Upload files clicked [MAIN]");
     helper.handleUploadFilesClick();
