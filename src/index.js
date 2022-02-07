@@ -5,7 +5,7 @@ import { App } from './App';
 import reportWebVitals from './reportWebVitals';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-window.api.send("get-repo-resources", {});
+// window.api.send("get-repo-resources", {});
 
 ReactDOM.render(
   <React.StrictMode>

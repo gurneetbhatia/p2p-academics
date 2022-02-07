@@ -2,6 +2,8 @@ import React from 'react';
 
 let activeResources = [];
 window.api.receive("return-active-resources", (response) => {
+    console.log("received active resources [REACT]");
+    console.log(response);
     if (response) {
         activeResources = response;
     }

@@ -125,7 +125,8 @@ ipcMain.on("get-repo-resources", (event, args) => {
 });
 
 ipcMain.on("get-active-resources", (event, args) => {
-    console.log("getting remote resources [MAIN]");
+    console.log("GETTING ACTIVE RESOURCES [MAIN]");
+    event.reply("return-active-resources", helper.getActiveResources());
 });
 
 ipcMain.on("upload-files-click", (event, args) => {

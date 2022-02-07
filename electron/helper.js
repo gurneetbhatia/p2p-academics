@@ -183,7 +183,17 @@ function updateResource(fileprops) {
 
 function getActiveResources(serverUID) {
     // return all resources from the database where the serverUID is not the argument provided
-    
+    const db = client.db("desktop-app");
+    const resourcesCollection = db.collection("resources");
+    var resourcesCursor = resourcesCollection.find({});
+    var activeResources = [];
+    resourcesCursor.forEach((resc) => {
+        if (resc.serverUID !== serverUID) {
+            activeResources.push(resc);
+        }
+    });
+
+    return activeResources;
 }
 
 module.exports = {
@@ -197,5 +207,6 @@ module.exports = {
     closeApplication: closeApplication,
     handleUploadFilesClick: handleUploadFilesClick,
     deleteResource: deleteResource,
-    updateResource: updateResource
+    updateResource: updateResource,
+    getActiveResources: getActiveResources
 }
