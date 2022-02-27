@@ -1,4 +1,5 @@
 import React from 'react';
+import ResourceCard from '../components/resource-card';
 
 let activeResources = [];
 window.api.receive("return-active-resources", (response) => {
@@ -14,7 +15,14 @@ window.api.send("get-active-resources", {});
 class ExplorePage extends React.Component {
     render() {
         return (
-            <div>Explore Page</div>
+            <div>
+                {/* <h1></h1> */}
+                {
+                    activeResources.map((element, index) => {
+                        return <ResourceCard isOwner={false} key={index} fileid={element.fileid} filename={element.filename} title={element.title} abstract={element.abstract} authors={element.authors} knowledgeDomains={element.knowledgeDomains}></ResourceCard>
+                    })
+                }
+            </div>
         );
     }
 }

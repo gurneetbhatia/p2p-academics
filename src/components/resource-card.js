@@ -27,6 +27,7 @@ class ResourceCard extends React.Component {
         this.handleDelete = this.handleDelete.bind(this);
         this.handleInfoModalSubmit = this.handleInfoModalSubmit.bind(this);
         this.handleInfoModalChange = this.handleInfoModalChange.bind(this);
+        this.getDeleteButton = this.getDeleteButton.bind(this);
     }
 
     handleModalClose() {
@@ -63,6 +64,12 @@ class ResourceCard extends React.Component {
         }
     }
 
+    getDeleteButton() {
+        if (this.props.isOwner) {
+            return <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
+        }
+    }
+
     render() {
         return (
             <>
@@ -74,7 +81,7 @@ class ResourceCard extends React.Component {
                         <Card.Footer>
                             <Button variant="info" onClick={this.handleModalShow}><FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon></Button>
                             <Button variant="info"><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
-                            <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
+                            {this.getDeleteButton()}
                         </Card.Footer>
                     </Card.Body>
                 </Card>
@@ -87,17 +94,17 @@ class ResourceCard extends React.Component {
                         <Form onSubmit={this.handleInfoModalSubmit}>
                             <Form.Group controlId="title" className="mb-3">
                                 <Form.Label>Title</Form.Label>
-                                <Form.Control onChange={this.handleInfoModalChange} type="text" placeholder="Enter title of paper" value={this.state.title}></Form.Control>
+                                <Form.Control disabled={!this.props.isOwner} onChange={this.handleInfoModalChange} type="text" placeholder="Enter title of paper" value={this.state.title}></Form.Control>
                             </Form.Group>
 
                             <Form.Group controlId="abstract" className="mb-3">
                                 <Form.Label>Abstract</Form.Label>
-                                <Form.Control onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter abstract of paper" value={this.state.abstract}></Form.Control>
+                                <Form.Control disabled={!this.props.isOwner} onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter abstract of paper" value={this.state.abstract}></Form.Control>
                             </Form.Group>
 
                             <Form.Group controlId="authors" className="mb-3">
                                 <Form.Label>Authors</Form.Label>
-                                <Form.Control onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter names of authors (on new lines)" value={this.state.authors}></Form.Control>
+                                <Form.Control disabled={!this.props.isOwner} onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter names of authors (on new lines)" value={this.state.authors}></Form.Control>
                                 {/* {
                                     this.state.authors?.map((author, index) => {
                                         return <Form.Control onChange={this.handleInfoModalChange} type="text" key={index} value={author} placeholder="Enter name of author"></Form.Control>
@@ -108,7 +115,7 @@ class ResourceCard extends React.Component {
 
                             <Form.Group controlId="knowledge-domains">
                                 <Form.Label>Knowledge Domains</Form.Label>
-                                <Form.Control onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter knowledge domains (on new lines)" value={this.state.knowledgeDomains}></Form.Control>
+                                <Form.Control disabled={!this.props.isOwner} onChange={this.handleInfoModalChange} as="textarea" type="text" rows={3} placeholder="Enter knowledge domains (on new lines)" value={this.state.knowledgeDomains}></Form.Control>
                                 {/* {
                                     this.state.knowledgeDomains?.map((author, index) => {
                                         return <Form.Control onChange={this.handleInfoModalChange} type="text" key={index} value={author} placeholder="Enter name of author"></Form.Control>
@@ -119,11 +126,11 @@ class ResourceCard extends React.Component {
                             
                             <ButtonToolbar>
                                 <ButtonGroup>
-                                    <Button variant="danger">Cancel</Button>
+                                    <Button disabled={!this.props.isOwner} variant="danger">Cancel</Button>
                                 </ButtonGroup>
 
                                 <ButtonGroup>
-                                <Button variant="primary" type="submit">Submit</Button>
+                                <Button disabled={!this.props.isOwner} variant="primary" type="submit">Submit</Button>
                                 </ButtonGroup>
                             </ButtonToolbar>
                             {/* <Button variant="danger">Cancel</Button> */}
