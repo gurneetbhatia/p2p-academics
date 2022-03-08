@@ -45,7 +45,7 @@ async function initialiseServer() {
     // })
 
     // now connect to all other active servers
-    activeServers = helper.fetchActiveServers();
+    /*activeServers = helper.fetchActiveServers();
     activeServers.toArray((err, documents) => {
         if (err) throw err;
         documents.forEach(element => {
@@ -58,7 +58,7 @@ async function initialiseServer() {
                 socketServers.push(newSocket);
             }
         });
-    })
+    })*/
     // console.log(activeServers);
     // console.log(activeServers.array);
 }
