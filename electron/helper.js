@@ -34,24 +34,26 @@ function getRepositoryResources() {
     let fileObjs = [];
     filenames.forEach((filename) => {
         if (filename !== "meta.json") {
-            // check if the filename exists in filenames
+            // check if the filename exists in meta.json
             let metaObj;
             filesMeta.some((element) => {
                 console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
                     return true;
-                } else {
-                    metaObj =  {
-                        filename: filename,
-                        title: undefined,
-                        abstract: undefined,
-                        authors: undefined,
-                        knowledgeDomains: undefined
-                    };
-                    return false;
                 }
             });
+            if (!metaObj) {
+                const fileid = generateServerUID();
+                metaObj =  {
+                    fileid: fileid,
+                    filename: filename,
+                    title: undefined,
+                    abstract: undefined,
+                    authors: undefined,
+                    knowledgeDomains: undefined
+                };
+            }
             fileObjs.push(metaObj);
         }
     })
@@ -77,14 +79,19 @@ function fetchActiveServers() {
 
 function updateResourcesList(serverUID) {
     const db = client.db("desktop-app");
-    fs.readdir(__dirname + '/../Repository', (err, files) => {
-        if (err) {
-            console.log("Unable to scan directory: " + err);
-        }
-        const rescourcesCollection = db.collection("resources");
-        files.forEach((file) => {
-            rescourcesCollection.insertOne({serverUID: serverUID, filename: file, knowledgeDomains: [], author: 'some author'});
-        })
+    var files = getRepositoryResources();
+    const resourcesCollection = db.collection("resources");
+    var remoteResourcesCursor = resourcesCollection.find({serverUID: serverUID});
+    remoteResourcesCursor.forEach((resc) => {
+        files = files.filter((file) => {
+            // remove any files that are already on the remote database
+            return file.fileid !== resc.fileid;
+        });
+    });
+    // push the remaining files to the database
+    files.forEach((file) => {
+        file["serverUID"] = serverUID;
+        resourcesCollection.insertOne(file);
     });
 }
 
@@ -144,6 +151,7 @@ function deleteResource(filename) {
 
 function updateResource(fileprops) {
     const newFileObj = {
+        fileid: fileprops.fileid,
         filename: fileprops.filename,
         title: fileprops.title,
         abstract: fileprops.abstract,
@@ -173,6 +181,14 @@ function updateResource(fileprops) {
 
 }
 
+function getActiveResources(serverUID) {
+    // return all resources from the database where the serverUID is not the argument provided
+    const db = client.db("desktop-app");
+    const resourcesCollection = db.collection("resources");
+
+    return resourcesCollection.find();
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -184,5 +200,6 @@ module.exports = {
     closeApplication: closeApplication,
     handleUploadFilesClick: handleUploadFilesClick,
     deleteResource: deleteResource,
-    updateResource: updateResource
+    updateResource: updateResource,
+    getActiveResources: getActiveResources
 }

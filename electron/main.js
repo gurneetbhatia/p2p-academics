@@ -59,8 +59,8 @@ async function initialiseServer() {
             }
         });
     })
-    console.log(activeServers);
-    console.log(activeServers.array);
+    // console.log(activeServers);
+    // console.log(activeServers.array);
 }
 initialiseServer();
 
@@ -122,6 +122,16 @@ ipcMain.on("get-repo-resources", (event, args) => {
     event.reply("return-repo-resources", helper.getRepositoryResources());
     // event.reply("return-repo-resources", "test response");
     //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
+});
+
+ipcMain.on("get-active-resources", (event, args) => {
+    console.log("GETTING ACTIVE RESOURCES [MAIN]");
+    // event.reply("return-active-resources", helper.getActiveResources());
+    helper.getActiveResources().toArray((err, documents) => {
+        if (err) throw err;
+
+        event.reply("return-active-resources", documents);
+    })
 });
 
 ipcMain.on("upload-files-click", (event, args) => {

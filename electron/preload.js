@@ -9,14 +9,18 @@ contextBridge.exposeInMainWorld(
                 "get-repo-resources",
                 "upload-files-click",
                 "delete-resource",
-                "update-resource"
+                "update-resource",
+                "get-active-resources"
             ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["return-repo-resources"];
+            const validChannels = [
+                "return-repo-resources",
+                "return-active-resources"
+            ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }
