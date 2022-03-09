@@ -66,7 +66,7 @@ class ResourceCard extends React.Component {
     }
 
     handleViewFile() {
-        window.api.send("view-file", {filename: this.state.filename});
+        window.api.send("view-file", {filename: this.state.filename, fileid: this.state.fileid});
     }
 
     getDeleteButton() {

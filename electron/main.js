@@ -155,8 +155,10 @@ ipcMain.on("view-file", (event, args) => {
         width: 800,
         height: 600
     });
-    
+
     win.loadURL(__dirname + '/../Repository/' + args.filename)
+
+    // helper.getFilePath
 });
 
 app.whenReady().then(createWindow);

@@ -189,6 +189,25 @@ function getActiveResources(serverUID) {
     return resourcesCollection.find();
 }
 
+function getFilePath(fileid, filename) {
+    const directoryPath = __dirname + '/../Repository/';
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
+    let metaObj;
+    filesMeta.some((element) => {
+        console.log(element.filename);
+        if (element.fileid === fileid) {
+            metaObj = element
+            return true;
+        }
+    });
+    if (metaObj) {
+        return directoryPath + filename;
+    }
+
+    // the file could not be located locally so we need to fetch the remote version of it
+
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -201,5 +220,6 @@ module.exports = {
     handleUploadFilesClick: handleUploadFilesClick,
     deleteResource: deleteResource,
     updateResource: updateResource,
-    getActiveResources: getActiveResources
+    getActiveResources: getActiveResources,
+    getFilePath: getFilePath
 }
