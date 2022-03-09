@@ -155,8 +155,7 @@ ipcMain.on("view-file", (event, args) => {
         width: 800,
         height: 600
     });
-    console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEE" + __dirname + '/../Repository/' + args.filename);
-
+    
     win.loadURL(__dirname + '/../Repository/' + args.filename)
 });
 
@@ -174,15 +173,5 @@ app.on('activate', () => {
         createWindow();
     }
 });
-
-app.on('ready', () => {
-    const win = new PDFWindow({
-        width: 800,
-        height: 600
-    });
-    console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEE" + __dirname);
-
-    win.loadURL(__dirname + '/../Repository/compressed.tracemonkey-pldi-09.pdf')
-})
 
 // helper.getRepositoryResources();
