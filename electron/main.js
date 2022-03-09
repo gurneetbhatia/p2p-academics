@@ -8,6 +8,7 @@ const fs = require('fs');
 const io = require("socket.io")();
 const socketClient = require("socket.io-client");
 const helper = require('./helper');
+const PDFWindow = require('electron-pdf-window');
 
 let socketServers = []
 
@@ -149,6 +150,16 @@ ipcMain.on("update-resource", (event, args) => {
     helper.updateResource(args);
 });
 
+ipcMain.on("view-file", (event, args) => {
+    const win = new PDFWindow({
+        width: 800,
+        height: 600
+    });
+    console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEE" + __dirname + '/../Repository/' + args.filename);
+
+    win.loadURL(__dirname + '/../Repository/' + args.filename)
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
@@ -163,5 +174,15 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+app.on('ready', () => {
+    const win = new PDFWindow({
+        width: 800,
+        height: 600
+    });
+    console.log("HEREEEEEEEEEEEEEEEEEEEEEEEEE" + __dirname);
+
+    win.loadURL(__dirname + '/../Repository/compressed.tracemonkey-pldi-09.pdf')
+})
 
 // helper.getRepositoryResources();

@@ -18,6 +18,8 @@
     "bufferutil": "^4.0.4",
     "crypto": "^1.0.1",
     "electron-is-dev": "^2.0.0",
+    "electron-pdf-viewer": "^1.0.1",
+    "electron-pdf-window": "^1.0.12",
     "ffmetadata": "^1.7.0",
     "file-metadata": "^3.0.0",
     "holder": "^0.0.0",

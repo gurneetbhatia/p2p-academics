@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld(
                 "upload-files-click",
                 "delete-resource",
                 "update-resource",
-                "get-active-resources"
+                "get-active-resources",
+                "view-file"
             ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
