@@ -28,10 +28,12 @@ async function initialiseServer() {
     io.on('connection', (socket) => {
         console.log("client connection detected");
         console.log(socket);
-        socket.on("request-resource", (args) => {
+        socket.on("request-resource", (args, callback) => {
             console.log("resource request detected [SOCKET]");
-            console.log(socket);
             console.log(args);
+            callback({
+                status: 'ok'
+            });
         });
     });
 
@@ -43,11 +45,13 @@ async function initialiseServer() {
 
     const newSocket = socketClient("http://localhost:8000", {
         reconnectionDelayMax: 10000,
-        path: '/socket.io/sockets/' + '1ab71a7b207f24f5bb5aed5ae05042f2e9479849'
+        path: '/socket.io/sockets/' + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641'
     });
-    console.log("Connected to " + '1ab71a7b207f24f5bb5aed5ae05042f2e9479849');
+    console.log("Connected to " + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641');
     socketServers.push(newSocket);
-    newSocket.emit("request-resource", {fileid: 'some file id'});
+    newSocket.emit("request-resource", {fileid: 'some file id'}, (response) => {
+        console.log(response);
+    });
 
     /**
      * Note to self: Upon starting the application, also update the database
