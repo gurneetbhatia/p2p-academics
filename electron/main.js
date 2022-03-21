@@ -37,21 +37,15 @@ async function initialiseServer() {
         });
     });
 
-    io.on('request-resource', (socket, args) => {
-        console.log("resource request detected [IO]");
-        console.log(socket);
-        console.log(args);
-    });
-
-    const newSocket = socketClient("http://localhost:8000", {
-        reconnectionDelayMax: 10000,
-        path: '/socket.io/sockets/' + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641'
-    });
-    console.log("Connected to " + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641');
-    socketServers.push(newSocket);
-    newSocket.emit("request-resource", {fileid: 'some file id'}, (response) => {
-        console.log(response);
-    });
+    // const newSocket = socketClient("http://localhost:8000", {
+    //     reconnectionDelayMax: 10000,
+    //     path: '/socket.io/sockets/' + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641'
+    // });
+    // console.log("Connected to " + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641');
+    // socketServers.push(newSocket);
+    // newSocket.emit("request-resource", {fileid: 'some file id'}, (response) => {
+    //     console.log(response);
+    // });
 
     /**
      * Note to self: Upon starting the application, also update the database
