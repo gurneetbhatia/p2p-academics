@@ -201,11 +201,22 @@ function getFilePath(fileid, filename) {
         }
     });
     if (metaObj) {
-        return directoryPath + filename;
+        return {filepath: directoryPath + filename};
     }
 
     // the file could not be located locally so we need to fetch the remote version of it
+    getActiveResources().toArray((err, documents) => {
+        if (err) throw err;
 
+        let serverUID = null;
+        documents.forEach((file) => {
+            if (file.fileid === fileid) {
+                serverUID = file.serverUID;
+            }
+        });
+
+        return {serverUID: serverUID};
+    });
 }
 
 module.exports = {

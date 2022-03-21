@@ -28,7 +28,26 @@ async function initialiseServer() {
     io.on('connection', (socket) => {
         console.log("client connection detected");
         console.log(socket);
+        socket.on("request-resource", (args) => {
+            console.log("resource request detected [SOCKET]");
+            console.log(socket);
+            console.log(args);
+        });
     });
+
+    io.on('request-resource', (socket, args) => {
+        console.log("resource request detected [IO]");
+        console.log(socket);
+        console.log(args);
+    });
+
+    const newSocket = socketClient("http://localhost:8000", {
+        reconnectionDelayMax: 10000,
+        path: '/socket.io/sockets/' + '1ab71a7b207f24f5bb5aed5ae05042f2e9479849'
+    });
+    console.log("Connected to " + '1ab71a7b207f24f5bb5aed5ae05042f2e9479849');
+    socketServers.push(newSocket);
+    newSocket.emit("request-resource", {fileid: 'some file id'});
 
     /**
      * Note to self: Upon starting the application, also update the database
@@ -155,10 +174,25 @@ ipcMain.on("view-file", (event, args) => {
         width: 800,
         height: 600
     });
+    // win.loadURL(__dirname + '/../Repository/' + args.filename)
 
-    win.loadURL(__dirname + '/../Repository/' + args.filename)
-
-    // helper.getFilePath
+    const output = helper.getFilePath(args.fileid, args.filename);
+    console.log("in view-file");
+    if (output?.filepath) {
+        win.loadURL(output.filepath);
+    }
+    else if (output?.serverUID) {
+        // make a request to server uid for downloading fileid
+        console.log("initiating resource request");
+        console.log(output.serverUID);
+        const newSocket = socketClient("http://localhost:8000", {
+            reconnectionDelayMax: 10000,
+            path: '/socket.io/sockets/' + output.serverUID
+        });
+        console.log("Connected to " + output.serverUID);
+        socketServers.push(newSocket);
+        newSocket.emit("request-resource", {fileid: args.fileid});
+    }
 });
 
 app.whenReady().then(createWindow);
