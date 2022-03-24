@@ -189,6 +189,60 @@ function getActiveResources(serverUID) {
     return resourcesCollection.find();
 }
 
+function getFilePath(fileid, filename) {
+    const directoryPath = __dirname + '/../Repository/';
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
+    let metaObj;
+    filesMeta.some((element) => {
+        console.log(element.filename);
+        if (element.fileid === fileid) {
+            metaObj = element
+            return true;
+        }
+    });
+    if (metaObj) {
+        return {filepath: directoryPath + filename};
+    }
+
+    // the file could not be located locally so we need to fetch the remote version of it
+    return null;
+}
+
+function getFileBuffer(fileid) {
+    console.log("GET FILE STREAM 0");
+    const resources = getRepositoryResources();
+    console.log(resources);
+    const directoryPath = __dirname + '/../Repository/';
+
+    // const stream = fs.createReadStream(directoryPath);
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
+    let metaObj;
+    filesMeta.some((element) => {
+        if (element.fileid === fileid) {
+            metaObj = element
+            return true;
+        }
+    });
+    if (metaObj) {
+        console.log("HERE")
+        const buffer = fs.readFileSync(directoryPath + metaObj.filename);
+        return buffer;
+    }
+
+    return null;
+}
+
+function createTempFile(buffer, filename) {
+    const directoryPath = __dirname + '/../Temp/';
+    // fs.writeFileSync(directoryPath + filename, buffer);
+    fs.open(directoryPath + filename, 'w', (err, file) => {
+        if (err) throw err;
+
+        fs.writeFileSync(directoryPath + filename, buffer);
+    })
+    return directoryPath + filename;
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -201,5 +255,8 @@ module.exports = {
     handleUploadFilesClick: handleUploadFilesClick,
     deleteResource: deleteResource,
     updateResource: updateResource,
-    getActiveResources: getActiveResources
+    getActiveResources: getActiveResources,
+    getFilePath: getFilePath,
+    getFileBuffer: getFileBuffer,
+    createTempFile, createTempFile
 }

@@ -8,6 +8,8 @@ const fs = require('fs');
 const io = require("socket.io")();
 const socketClient = require("socket.io-client");
 const helper = require('./helper');
+const PDFWindow = require('electron-pdf-window');
+const socketStream = require("socket.io-stream");
 
 let socketServers = []
 
@@ -26,8 +28,24 @@ async function initialiseServer() {
 
     io.on('connection', (socket) => {
         console.log("client connection detected");
-        console.log(socket);
+        socket.on("request-resource", (args, callback) => {
+            console.log("resource request detected [SOCKET]");
+            console.log(args);
+            const fileBuffer = helper.getFileBuffer(args.fileid);
+            const output = fileBuffer? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
+            callback(output);
+        });
     });
+
+    // const newSocket = socketClient("http://localhost:8000", {
+    //     reconnectionDelayMax: 10000,
+    //     path: '/socket.io/sockets/' + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641'
+    // });
+    // console.log("Connected to " + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641');
+    // socketServers.push(newSocket);
+    // newSocket.emit("request-resource", {fileid: 'some file id'}, (response) => {
+    //     console.log(response);
+    // });
 
     /**
      * Note to self: Upon starting the application, also update the database
@@ -147,6 +165,55 @@ ipcMain.on("delete-resource", (event, args) => {
 
 ipcMain.on("update-resource", (event, args) => {
     helper.updateResource(args);
+});
+
+ipcMain.on("view-file", (event, args) => {
+    const win = new PDFWindow({
+        width: 800,
+        height: 600
+    });
+    // win.loadURL(__dirname + '/../Repository/' + args.filename)
+
+    const output = helper.getFilePath(args.fileid, args.filename);
+    console.log("in view-file");
+    console.log(output);
+    console.log(args.fileid);
+    if (output?.filepath) {
+        console.log("here for some reason");
+        console.log(output?.filepath)
+        win.loadURL(output.filepath);
+    }
+    else {
+        // make a request to server uid for downloading fileid
+        console.log("initiating resource request");
+        // console.log(helper.getFileStream(args.fileid));
+        helper.getActiveResources().toArray((err, documents) => {
+            if (err) throw err;
+    
+            let serverUID = null;
+            documents.forEach((file) => {
+                if (file.fileid === args.fileid) {
+                    serverUID = file.serverUID;
+                }
+            });
+            console.log(serverUID);
+            const newSocket = socketClient("http://localhost:8000", {
+                reconnectionDelayMax: 10000,
+                path: '/socket.io/sockets/' + serverUID
+            });
+            console.log("Connected to " + serverUID);
+            socketServers.push(newSocket);
+            newSocket.emit("request-resource", {fileid: args.fileid}, (response) => {
+                console.log("Response from socket");
+                // write this buffer to a new file
+                console.log(response);
+                if (response.status === 'ok') {
+                    const tempFilePath = helper.createTempFile(response.buffer, args.filename);
+                    win.loadURL(tempFilePath);
+                }
+            });
+        });
+    }
 });
 
 app.whenReady().then(createWindow);

@@ -28,6 +28,7 @@ class ResourceCard extends React.Component {
         this.handleInfoModalSubmit = this.handleInfoModalSubmit.bind(this);
         this.handleInfoModalChange = this.handleInfoModalChange.bind(this);
         this.getDeleteButton = this.getDeleteButton.bind(this);
+        this.handleViewFile = this.handleViewFile.bind(this);
     }
 
     handleModalClose() {
@@ -64,6 +65,10 @@ class ResourceCard extends React.Component {
         }
     }
 
+    handleViewFile() {
+        window.api.send("view-file", {filename: this.state.filename, fileid: this.state.fileid, isOwner: this.props.isOwner});
+    }
+
     getDeleteButton() {
         if (this.props.isOwner) {
             return <Button variant="danger" onClick={this.handleDelete}><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></Button>
@@ -80,7 +85,7 @@ class ResourceCard extends React.Component {
                         <Card.Text>{this.state.abstract ? this.state.abstract : "Please complete the details for this resource (Click on the info icon below)."}</Card.Text>
                         <Card.Footer>
                             <Button variant="info" onClick={this.handleModalShow}><FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon></Button>
-                            <Button variant="info"><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
+                            <Button variant="info" onClick={this.handleViewFile}><FontAwesomeIcon icon={faEye}></FontAwesomeIcon></Button>
                             {this.getDeleteButton()}
                         </Card.Footer>
                     </Card.Body>

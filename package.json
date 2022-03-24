@@ -18,6 +18,8 @@
     "bufferutil": "^4.0.4",
     "crypto": "^1.0.1",
     "electron-is-dev": "^2.0.0",
+    "electron-pdf-viewer": "^1.0.1",
+    "electron-pdf-window": "^1.0.12",
     "ffmetadata": "^1.7.0",
     "file-metadata": "^3.0.0",
     "holder": "^0.0.0",
@@ -30,6 +32,7 @@
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "socket.io": "^4.2.0",
+    "socket.io-stream": "^0.9.1",
     "utf-8-validate": "^5.0.6",
     "web-vitals": "^1.1.2"
   },
