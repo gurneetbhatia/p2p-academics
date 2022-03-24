@@ -205,18 +205,42 @@ function getFilePath(fileid, filename) {
     }
 
     // the file could not be located locally so we need to fetch the remote version of it
-    getActiveResources().toArray((err, documents) => {
+    return null;
+}
+
+function getFileBuffer(fileid) {
+    console.log("GET FILE STREAM 0");
+    const resources = getRepositoryResources();
+    console.log(resources);
+    const directoryPath = __dirname + '/../Repository/';
+
+    // const stream = fs.createReadStream(directoryPath);
+    const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
+    let metaObj;
+    filesMeta.some((element) => {
+        if (element.fileid === fileid) {
+            metaObj = element
+            return true;
+        }
+    });
+    if (metaObj) {
+        console.log("HERE")
+        const buffer = fs.readFileSync(directoryPath + metaObj.filename);
+        return buffer;
+    }
+
+    return null;
+}
+
+function createTempFile(buffer, filename) {
+    const directoryPath = __dirname + '/../Temp/';
+    // fs.writeFileSync(directoryPath + filename, buffer);
+    fs.open(directoryPath + filename, 'w', (err, file) => {
         if (err) throw err;
 
-        let serverUID = null;
-        documents.forEach((file) => {
-            if (file.fileid === fileid) {
-                serverUID = file.serverUID;
-            }
-        });
-
-        return {serverUID: serverUID};
-    });
+        fs.writeFileSync(directoryPath + filename, buffer);
+    })
+    return directoryPath + filename;
 }
 
 module.exports = {
@@ -232,5 +256,7 @@ module.exports = {
     deleteResource: deleteResource,
     updateResource: updateResource,
     getActiveResources: getActiveResources,
-    getFilePath: getFilePath
+    getFilePath: getFilePath,
+    getFileBuffer: getFileBuffer,
+    createTempFile, createTempFile
 }
