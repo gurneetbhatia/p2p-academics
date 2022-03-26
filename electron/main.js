@@ -35,6 +35,10 @@ async function initialiseServer() {
             const output = fileBuffer? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
             callback(output);
         });
+
+        socket.on("request-user-profiles", (args, callback) => {
+            
+        })
     });
 
     // const newSocket = socketClient("http://localhost:8000", {
@@ -217,8 +221,28 @@ ipcMain.on("view-file", (event, args) => {
 });
 
 ipcMain.on("get-user-profiles", (event, args) => {
-    
-})
+    console.log("Fetching user profiles");
+    helper.getActiveServers().toArray((err, documents) => {
+        if (err) throw err;
+        let profiles = [];
+
+        documents.forEach((doc) => {
+            console.log(doc.serverUID);
+            const newSocket = socketClient("http://localhost:8000", {
+                reconnectionDelayMax: 10000,
+                path: '/socket.io/sockets/' + doc.serverUID
+            });
+            newSocket.emit("request-user-profile", {}, (response) => {
+                console.log("response from socket");
+                console.log(response);
+                if (response.status === 'ok') {
+                    profiles.push(response);
+                }
+            });
+        });
+        event.reply("return-user-profiles", profiles);
+    })
+});
 
 app.whenReady().then(createWindow);
 
