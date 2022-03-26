@@ -243,6 +243,13 @@ function createTempFile(buffer, filename) {
     return directoryPath + filename;
 }
 
+function getActiveServers() {
+    const db = client.db("desktop-app");
+    const serversCollection = db.collection("active-servers");
+
+    return serversCollection.find();
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -258,5 +265,6 @@ module.exports = {
     getActiveResources: getActiveResources,
     getFilePath: getFilePath,
     getFileBuffer: getFileBuffer,
-    createTempFile, createTempFile
+    createTempFile: createTempFile,
+    getActiveServers: getActiveServers
 }
