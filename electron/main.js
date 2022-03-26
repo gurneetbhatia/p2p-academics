@@ -216,6 +216,10 @@ ipcMain.on("view-file", (event, args) => {
     }
 });
 
+ipcMain.on("get-user-profiles", (event, args) => {
+    
+})
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
