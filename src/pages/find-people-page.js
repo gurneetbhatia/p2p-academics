@@ -10,7 +10,7 @@ class FindPeoplePage extends React.Component {
     }
 
     componentWillMount() {
-        window.parseInt.receive("return-user-profiles", (response) => {
+        window.api.receive("return-user-profiles", (response) => {
             if (response) {
                 this.setState({profiles: response});
                 console.log(response);
@@ -23,7 +23,12 @@ class FindPeoplePage extends React.Component {
     render() {
         return (
             <div>
-                <ProfileCard name="Gurneet Bhatia" knowledgeDomains="Machine Learning"></ProfileCard>
+                {/* <ProfileCard name="Gurneet Bhatia" knowledgeDomains="Machine Learning"></ProfileCard> */}
+                {
+                    this.state.profiles.map((element, index) => {
+                        return <ProfileCard key={index} name={element.name} knowledgeDomains={element.knowledgeDomains}></ProfileCard>
+                    })
+                }
             </div>
         );
     }
