@@ -112,7 +112,7 @@ function registerUser(data) {
         email: data.email,
         knowledgeDomains: []
     });
-    const filepath = './user/meta.txt';
+    const filepath = './user/meta.json';
     mkdirp(getDirName(filepath), (err) => {
         console.log(err);
     })

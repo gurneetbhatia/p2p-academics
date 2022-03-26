@@ -15,7 +15,7 @@ async function connectToMongo() {
 }
 
 function checkIfInitialised() {
-    const dir = './user/meta.txt';
+    const dir = './user/meta.json';
 
     if (fs.existsSync(dir)) {
         console.log('Initialised');
