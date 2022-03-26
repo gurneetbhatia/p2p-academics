@@ -1,9 +1,12 @@
 import React from 'react';
+import ProfileCard from '../components/profile-card';
 
 class FindPeoplePage extends React.Component {
     render() {
         return (
-            <div>FindPeople Page</div>
+            <div>
+                <ProfileCard name="Gurneet Bhatia" knowledgeDomains="Machine Learning"></ProfileCard>
+            </div>
         );
     }
 }
