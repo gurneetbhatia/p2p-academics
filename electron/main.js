@@ -32,12 +32,17 @@ async function initialiseServer() {
             console.log("resource request detected [SOCKET]");
             console.log(args);
             const fileBuffer = helper.getFileBuffer(args.fileid);
-            const output = fileBuffer? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
+            const output = fileBuffer ? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
             callback(output);
         });
 
-        socket.on("request-user-profiles", (args, callback) => {
-            
+        socket.on("request-user-profile", (args, callback) => {
+            console.log("user profile request detected [SOCKET");
+            const profile = helper.getUserProfile();
+            callback({
+                status: 'ok',
+                profile: profile
+            });
         })
     });
 

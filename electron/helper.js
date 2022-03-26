@@ -250,6 +250,10 @@ function getActiveServers() {
     return serversCollection.find();
 }
 
+function getUserProfile() {
+    return fs.readFileSync("/user/meta.json");
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -266,5 +270,6 @@ module.exports = {
     getFilePath: getFilePath,
     getFileBuffer: getFileBuffer,
     createTempFile: createTempFile,
-    getActiveServers: getActiveServers
+    getActiveServers: getActiveServers,
+    getUserProfile: getUserProfile
 }
