@@ -251,7 +251,7 @@ function getActiveServers() {
 }
 
 function getUserProfile() {
-    return fs.readFileSync("/user/meta.json");
+    return JSON.parse(fs.readFileSync("./user/meta.json"));
 }
 
 module.exports = {
