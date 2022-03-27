@@ -15,18 +15,19 @@ class ChatsPage extends React.Component {
     componentWillMount() {
         window.api.receive("return-active-chats", (response) => {
             if (response) {
+                console.log(response);
                 this.setState({activeChats: response});
             }
         });
 
-        window.api.receive("return-available-chats", (response) => {
+        window.api.receive("return-user-profiles", (response) => {
             if (response) {
                 this.setState({availableChats: response});
             }
         });
 
         window.api.send("get-active-chats", {});
-        window.api.send("get-available-chats", {});
+        window.api.send("get-user-profiles", {});
     }
 
     render() {

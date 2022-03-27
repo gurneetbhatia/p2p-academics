@@ -255,6 +255,11 @@ ipcMain.on("get-user-profiles", (event, args) => {
     })
 });
 
+ipcMain.on("get-active-chats", (event, args) => {
+    console.log("Fetching active chats");
+    event.reply("return-active-chats", helper.getActiveChats());
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
