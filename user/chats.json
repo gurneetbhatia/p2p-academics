@@ -3,7 +3,8 @@
         {
             "message": "",
             "sender": "",
-            "timestamp": ""
+            "timestamp": "",
+            "seen": ""
         }
     ]
 }
