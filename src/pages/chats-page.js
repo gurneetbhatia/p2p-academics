@@ -3,6 +3,32 @@ import { Container, Row, Col } from 'react-bootstrap';
 import ChatsSidebar from '../components/chats-sidebar';
 
 class ChatsPage extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            activeChats: [],
+            availableChats: []
+        }
+    }
+
+    componentWillMount() {
+        window.api.receive("return-active-chats", (response) => {
+            if (response) {
+                this.setState({activeChats: response});
+            }
+        });
+
+        window.api.receive("return-available-chats", (response) => {
+            if (response) {
+                this.setState({availableChats: response});
+            }
+        });
+
+        window.api.send("get-active-chats", {});
+        window.api.send("get-available-chats", {});
+    }
+
     render() {
         return (
             <div>
