@@ -1,12 +1,14 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import ChatsSidebar from '../components/chats-sidebar';
+import MessageWindow from '../components/MessageWindow';
 
 class ChatsPage extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            selectedChat: "",
             activeChats: [],
             availableChats: []
         }
@@ -39,7 +41,7 @@ class ChatsPage extends React.Component {
                             <ChatsSidebar chats={[{serverUID: 'abc', name: 'gurneet'}]}></ChatsSidebar>
                         </Col>
                         <Col xs={10} id="chats-page-content-wrapper">
-                            the main text chat goes here
+                            <MessageWindow name={"Gurneet Bhatia"}></MessageWindow>
                         </Col>
                     </Row>
                 </Container>
