@@ -12,7 +12,7 @@ class ChatsSidebar extends React.Component {
 
     render() {
         return (
-            <Nav className="col-md-20 bg-dark sidebar">
+            <Nav className="col-md-12 d-none d-md-block bg-dark chats-sidebar">
                 <div className="sidebar-sticky"></div>
                 {
                     this.state.chats.map((element, index) => {
