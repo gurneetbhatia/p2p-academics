@@ -254,6 +254,10 @@ function getUserProfile() {
     return JSON.parse(fs.readFileSync("./user/meta.json"));
 }
 
+function getActiveChats() {
+    return JSON.parse(fs.readFileSync("./user/chats.json"));
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -271,5 +275,6 @@ module.exports = {
     getFileBuffer: getFileBuffer,
     createTempFile: createTempFile,
     getActiveServers: getActiveServers,
-    getUserProfile: getUserProfile
+    getUserProfile: getUserProfile,
+    getActiveChats: getActiveChats
 }
