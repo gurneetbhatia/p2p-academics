@@ -13,14 +13,14 @@
     margin-bottom: 0;
 }
 
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: #4c4c6a;
     border-radius: 2px;
-} */
+}
 
 .chatbox {
     width: 100%;
