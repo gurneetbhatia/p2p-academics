@@ -11,7 +11,9 @@ contextBridge.exposeInMainWorld(
                 "delete-resource",
                 "update-resource",
                 "get-active-resources",
-                "view-file"
+                "view-file",
+                "get-user-profiles",
+                "get-active-chats"
             ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
@@ -20,7 +22,9 @@ contextBridge.exposeInMainWorld(
         receive: (channel, func) => {
             const validChannels = [
                 "return-repo-resources",
-                "return-active-resources"
+                "return-active-resources",
+                "return-user-profiles",
+                "return-active-chats"
             ];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));

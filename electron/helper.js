@@ -15,7 +15,7 @@ async function connectToMongo() {
 }
 
 function checkIfInitialised() {
-    const dir = './user/meta.txt';
+    const dir = './user/meta.json';
 
     if (fs.existsSync(dir)) {
         console.log('Initialised');
@@ -243,6 +243,21 @@ function createTempFile(buffer, filename) {
     return directoryPath + filename;
 }
 
+function getActiveServers() {
+    const db = client.db("desktop-app");
+    const serversCollection = db.collection("active-servers");
+
+    return serversCollection.find();
+}
+
+function getUserProfile() {
+    return JSON.parse(fs.readFileSync("./user/meta.json"));
+}
+
+function getActiveChats() {
+    return JSON.parse(fs.readFileSync("./user/chats.json"));
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -258,5 +273,8 @@ module.exports = {
     getActiveResources: getActiveResources,
     getFilePath: getFilePath,
     getFileBuffer: getFileBuffer,
-    createTempFile, createTempFile
+    createTempFile: createTempFile,
+    getActiveServers: getActiveServers,
+    getUserProfile: getUserProfile,
+    getActiveChats: getActiveChats
 }

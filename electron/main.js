@@ -32,9 +32,18 @@ async function initialiseServer() {
             console.log("resource request detected [SOCKET]");
             console.log(args);
             const fileBuffer = helper.getFileBuffer(args.fileid);
-            const output = fileBuffer? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
+            const output = fileBuffer ? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
             callback(output);
         });
+
+        socket.on("request-user-profile", (args, callback) => {
+            console.log("user profile request detected [SOCKET");
+            const profile = helper.getUserProfile();
+            callback({
+                status: 'ok',
+                profile: profile
+            });
+        })
     });
 
     // const newSocket = socketClient("http://localhost:8000", {
@@ -112,7 +121,7 @@ function registerUser(data) {
         email: data.email,
         knowledgeDomains: []
     });
-    const filepath = './user/meta.txt';
+    const filepath = './user/meta.json';
     mkdirp(getDirName(filepath), (err) => {
         console.log(err);
     })
@@ -125,6 +134,28 @@ function registerUser(data) {
     });
     console.log("User file saved locally");
     win.loadURL(baseUrl + '/');
+}
+
+async function requestUserProfiles(event, documents) {
+    for(doc of documents) {
+        console.log(doc.serverUID);
+        const newSocket = socketClient("http://localhost:8000", {
+            reconnectionDelayMax: 10000,
+            path: '/socket.io/sockets/' + doc.serverUID
+        });
+        await newSocket.emit("request-user-profile", {}, (response) => {
+            console.log("response from socket");
+            console.log(response);
+            if (response.status === 'ok') {
+                console.log("here")
+                let profile = response.profile;
+                profile["serverUID"] = doc.serverUID;
+                event.reply("return-user-profiles", profile)
+                // profiles.push(response.profile);
+            }
+        });
+    }
+    // event.reply("return-user-profiles", profiles);
 }
 
 ipcMain.on("register", (event, args) => {
@@ -214,6 +245,19 @@ ipcMain.on("view-file", (event, args) => {
             });
         });
     }
+});
+
+ipcMain.on("get-user-profiles", (event, args) => {
+    console.log("Fetching user profiles");
+    helper.getActiveServers().toArray((err, documents) => {
+        if (err) throw err;
+        requestUserProfiles(event, documents)
+    })
+});
+
+ipcMain.on("get-active-chats", (event, args) => {
+    console.log("Fetching active chats");
+    event.reply("return-active-chats", helper.getActiveChats());
 });
 
 app.whenReady().then(createWindow);
