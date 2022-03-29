@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
+const pdf = require('pdf-parse');
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/desktop-app?retryWrites=true&w=majority";
 let client;
@@ -40,21 +41,34 @@ function getRepositoryResources() {
                 console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
+                    fileObjs.push(metaObj);
                     return true;
                 }
             });
             if (!metaObj) {
                 const fileid = generateServerUID();
-                metaObj =  {
-                    fileid: fileid,
-                    filename: filename,
-                    title: undefined,
-                    abstract: undefined,
-                    authors: undefined,
-                    knowledgeDomains: undefined
-                };
+                const dataBuffer = fs.readFileSync(directoryPath + '/' + filename);
+                pdf(dataBuffer).then((fileParsedData) => {
+                    metaObj = {
+                        fileid: fileid,
+                        filename: filename,
+                        title: fileParsedData.info.Title,
+                        author: fileParsedData.info.Author,
+                        abstract: undefined,
+                        knowledgeDomains: fileParsedData.info.Keywords
+                    };
+                    fileObjs.push(metaObj);
+                });
+                // metaObj =  {
+                //     fileid: fileid,
+                //     filename: filename,
+                //     title: undefined,
+                //     abstract: undefined,
+                //     authors: undefined,
+                //     knowledgeDomains: undefined
+                // };
             }
-            fileObjs.push(metaObj);
+            // fileObjs.push(metaObj);
         }
     })
 
