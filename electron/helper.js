@@ -59,16 +59,7 @@ function getRepositoryResources() {
                     };
                     fileObjs.push(metaObj);
                 });
-                // metaObj =  {
-                //     fileid: fileid,
-                //     filename: filename,
-                //     title: undefined,
-                //     abstract: undefined,
-                //     authors: undefined,
-                //     knowledgeDomains: undefined
-                // };
             }
-            // fileObjs.push(metaObj);
         }
     })
 
