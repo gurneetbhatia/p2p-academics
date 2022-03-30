@@ -260,6 +260,10 @@ ipcMain.on("get-active-chats", (event, args) => {
     event.reply("return-active-chats", helper.getActiveChats());
 });
 
+ipcMain.on("send-query", (event, args) => {
+
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
