@@ -269,7 +269,17 @@ function getActiveChats() {
 async function sendMLQuery(query) {
     const response = await axios.get(API_BASE_URL + 'get-papers-and-authors?query=' + query);
     if (response.status === 'ok') {
-        return response;
+        //return response;
+        // response contains author and paper IDs
+        // we now need to fetch the papers here from the IDs
+        // the authors will be fetched using sockets in main.js
+        let papers = []
+        papers.forEach((paperId) => {
+            const resourcesCollection = db.collection("resources");
+            let result = resourcesCollection.findOne({fileid: paperId});
+            papers.push(JSON.parse(result));
+        });
+        return {papers: papers, authors: response.authors};
     }
     console.log('request failed for some reason');
     return {authors: [], papers: []};
