@@ -261,7 +261,7 @@ ipcMain.on("get-active-chats", (event, args) => {
 });
 
 ipcMain.on("send-query", (event, args) => {
-
+    event.reply("return-query-resources", helper.sendMLQuery(args.query));
 });
 
 app.whenReady().then(createWindow);

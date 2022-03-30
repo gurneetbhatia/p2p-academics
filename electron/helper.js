@@ -5,6 +5,8 @@ const path = require('path');
 const crypto = require('crypto');
 const pdf = require('pdf-parse');
 
+const API_BASE_URL = "localhost:5000/";
+
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/desktop-app?retryWrites=true&w=majority";
 let client;
 async function connectToMongo() {
@@ -263,6 +265,10 @@ function getActiveChats() {
     return JSON.parse(fs.readFileSync("./user/chats.json"));
 }
 
+async function sendMLQuery(query) {
+
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -281,5 +287,6 @@ module.exports = {
     createTempFile: createTempFile,
     getActiveServers: getActiveServers,
     getUserProfile: getUserProfile,
-    getActiveChats: getActiveChats
+    getActiveChats: getActiveChats,
+    sendMLQuery: sendMLQuery
 }
