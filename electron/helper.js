@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
 const pdf = require('pdf-parse');
+const axios = require('axios');
 
 const API_BASE_URL = "localhost:5000/";
 
@@ -266,7 +267,12 @@ function getActiveChats() {
 }
 
 async function sendMLQuery(query) {
-
+    const response = await axios.get(API_BASE_URL + 'get-papers-and-authors?query=' + query);
+    if (response.status === 'ok') {
+        return response;
+    }
+    console.log('request failed for some reason');
+    return {authors: [], papers: []};
 }
 
 module.exports = {
