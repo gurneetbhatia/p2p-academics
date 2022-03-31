@@ -57,9 +57,9 @@ function getPublicKey() {
     return keys.publicKey;
 }
 
-function encryptData(data) {
+function encryptData(data, publicKey) {
     // using code from https://www.sohamkamani.com/nodejs/rsa-encryption/
-    const publicKey = getPublicKey();
+    // const publicKey = getPublicKey();
     const encryptedData = crypto.publicEncrypt(
         {
             key: publicKey,
