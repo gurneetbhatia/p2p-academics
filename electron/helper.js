@@ -279,7 +279,7 @@ async function sendMLQuery(query) {
             let result = resourcesCollection.findOne({fileid: paperId});
             papers.push(JSON.parse(result));
         });
-        return {papers: papers, authors: response.authors};
+        return {resources: papers, authors: response.authors};
     }
     console.log('request failed for some reason');
     return {authors: [], papers: []};

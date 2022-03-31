@@ -18,9 +18,16 @@ class QueryPage extends React.Component {
         window.api.receive("return-query-results", (response) => {
             if (response) {
                 this.setState({
-                    authors: response.authors,
                     resources: response.resources
                 });
+            }
+        });
+    }
+
+    componentWillMount() {
+        window.api.receive("return-user-profiles", (response) => {
+            if (response) {
+                this.state.authors.push(response);
             }
         });
     }
