@@ -52,6 +52,43 @@ function setupEncryption(serverUID) {
     });
 }
 
+function getPublicKey() {
+    const keys = fs.readFileSync(__dirname + '/../user/keys.json');
+    return keys.publicKey;
+}
+
+function encryptData(data) {
+    // using code from https://www.sohamkamani.com/nodejs/rsa-encryption/
+    const publicKey = getPublicKey();
+    const encryptedData = crypto.publicEncrypt(
+        {
+            key: publicKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: "sha256"
+        },
+        Buffer.from(data)
+    );
+
+    return encryptedData;
+}
+
+function decryptData(data) {
+    const keys = fs.readFileSync(__dirname + '/../user/keys.json');
+    const privateKey = keys.privateKey;
+
+    // using code from https://www.sohamkamani.com/nodejs/rsa-encryption/
+    const decryptedData = crypto.privateDecrypt(
+        {
+            key: privateKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: "sha256"
+        },
+        data
+    );
+
+    return decryptedData;
+}
+
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
@@ -327,5 +364,8 @@ module.exports = {
     getUserProfile: getUserProfile,
     getActiveChats: getActiveChats,
     sendMLQuery: sendMLQuery,
-    setupEncryption: setupEncryption
-}
+    setupEncryption: setupEncryption,
+    getPublicKey: getPublicKey,
+    encryptData: encryptData,
+    decryptData: decryptData
+};
