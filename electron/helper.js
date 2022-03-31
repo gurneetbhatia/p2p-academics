@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
+const { generateKeyPair } = require('crypto');
 const pdf = require('pdf-parse');
 const axios = require('axios');
 
@@ -28,6 +29,27 @@ function checkIfInitialised() {
         console.log('Not Initialised');
         return false;
     }
+}
+
+function setupEncryption(serverUID) {
+    // used answer from https://stackoverflow.com/questions/8520973/how-to-create-a-pair-private-public-keys-using-node-js-crypto
+    generateKeyPair('rsa', {
+        modulusLength: 4096,
+        publicKeyEncoding: {
+            type: 'spki',
+            format: 'pem'
+        },
+        privateKeyEncoding: {
+            type: 'pkcs8',
+            format: 'pem',
+            cipher: 'aes-256-cbc',
+            passphrase: serverUID
+        }
+    }, (err, publicKey, privateKey) => {
+        if (err) throw err;
+
+        fs.writeFileSync(__dirname + '/../user/keys.json', {"publicKey": publicKey, "privateKey": privateKey});
+    });
 }
 
 function getRepositoryResources() {
@@ -304,5 +326,6 @@ module.exports = {
     getActiveServers: getActiveServers,
     getUserProfile: getUserProfile,
     getActiveChats: getActiveChats,
-    sendMLQuery: sendMLQuery
+    sendMLQuery: sendMLQuery,
+    setupEncryption: setupEncryption
 }

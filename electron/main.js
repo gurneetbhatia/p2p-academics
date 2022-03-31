@@ -19,6 +19,7 @@ async function initialiseServer() {
     await helper.connectToMongo();
     socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
+    helper.setupEncryption(socketServerUID);
     io.attach(8080, {
         pingInterval: 10000,
         pingTimeout: 5000,
