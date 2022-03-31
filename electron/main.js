@@ -19,6 +19,7 @@ async function initialiseServer() {
     await helper.connectToMongo();
     socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
+    helper.setupEncryption(socketServerUID);
     io.attach(8080, {
         pingInterval: 10000,
         pingTimeout: 5000,
@@ -39,55 +40,13 @@ async function initialiseServer() {
         socket.on("request-user-profile", (args, callback) => {
             console.log("user profile request detected [SOCKET");
             const profile = helper.getUserProfile();
-            callback({
+            callback(helper.encryptData({
                 status: 'ok',
                 profile: profile
-            });
+            }, args.publicKey));
         })
     });
-
-    // const newSocket = socketClient("http://localhost:8000", {
-    //     reconnectionDelayMax: 10000,
-    //     path: '/socket.io/sockets/' + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641'
-    // });
-    // console.log("Connected to " + '2b7b9fb80a4972d3f529ac0ffee6815e27b82641');
-    // socketServers.push(newSocket);
-    // newSocket.emit("request-resource", {fileid: 'some file id'}, (response) => {
-    //     console.log(response);
-    // });
-
-    /**
-     * Note to self: Upon starting the application, also update the database
-     * to correctly reflect the resources available on this device for the network.
-     */
     helper.updateResourcesList(socketServerUID);
-
-    // io.on('update-resource-list', (socket) => {
-    //     /**
-    //      * Call the helper function to fetch details of all available resources
-    //      * from the repository
-    //      * Then update the database with these
-    //      */
-    //     helper.updateResourceList();
-    // })
-
-    // now connect to all other active servers
-    /*activeServers = helper.fetchActiveServers();
-    activeServers.toArray((err, documents) => {
-        if (err) throw err;
-        documents.forEach(element => {
-            if (element.serverUID != socketServerUID) {
-                const newSocket = socketClient("http://localhost:8000", {
-                    reconnectionDelayMax: 10000,
-                    path: '/socket.io/sockets/' + element.serverUID
-                });
-                console.log("Connected to " + element.serverUID);
-                socketServers.push(newSocket);
-            }
-        });
-    })*/
-    // console.log(activeServers);
-    // console.log(activeServers.array);
 }
 initialiseServer();
 
@@ -138,42 +97,25 @@ function registerUser(data) {
 
 async function requestUserProfiles(event, documents) {
     for(doc of documents) {
-        // console.log(doc.serverUID);
-        // const newSocket = socketClient("http://localhost:8000", {
-        //     reconnectionDelayMax: 10000,
-        //     path: '/socket.io/sockets/' + doc.serverUID
-        // });
-        // await newSocket.emit("request-user-profile", {}, (response) => {
-        //     console.log("response from socket");
-        //     console.log(response);
-        //     if (response.status === 'ok') {
-        //         console.log("here")
-        //         let profile = response.profile;
-        //         profile["serverUID"] = doc.serverUID;
-        //         event.reply("return-user-profiles", profile)
-        //         // profiles.push(response.profile);
-        //     }
-        // });
-
-        requestSpecificUserProfile(doc.serverUID);
+        requestSpecificUserProfile(event, doc.serverUID);
     }
-    // event.reply("return-user-profiles", profiles);
 }
 
-async function requestSpecificUserProfile(userServerUID) {
+async function requestSpecificUserProfile(event, userServerUID) {
+    const publicKey = helper.getPublicKey();
     const newSocket = socketClient("http://localhost:8000", {
             reconnectionDelayMax: 10000,
-            path: '/socket.io/sockets/' + doc.serverUID
+            path: '/socket.io/sockets/' + userServerUID
     });
-    await newSocket.emit("request-user-profile", {}, (response) => {
+    await newSocket.emit("request-user-profile", {"publicKey": publicKey}, (response) => {
         console.log("response from socket");
+        helper.decryptData(response);
         console.log(response);
         if (response.status === 'ok') {
             console.log("here")
             let profile = response.profile;
-            profile["serverUID"] = doc.serverUID;
+            profile["serverUID"] = userServerUID;
             event.reply("return-user-profiles", profile)
-            // profiles.push(response.profile);
         }
     });
 }
@@ -284,7 +226,7 @@ ipcMain.on("send-query", (event, args) => {
     // event.reply("return-query-resources", helper.sendMLQuery(args.query));
     const result = helper.sendMLQuery(args.query);
     result.authors.forEach((serverUID) => {
-        requestSpecificUserProfile(serverUID);
+        requestSpecificUserProfile(event, serverUID);
     });
     event.reply("return-query-resources", {resources: result.resources});
 });
