@@ -138,24 +138,44 @@ function registerUser(data) {
 
 async function requestUserProfiles(event, documents) {
     for(doc of documents) {
-        console.log(doc.serverUID);
-        const newSocket = socketClient("http://localhost:8000", {
-            reconnectionDelayMax: 10000,
-            path: '/socket.io/sockets/' + doc.serverUID
-        });
-        await newSocket.emit("request-user-profile", {}, (response) => {
-            console.log("response from socket");
-            console.log(response);
-            if (response.status === 'ok') {
-                console.log("here")
-                let profile = response.profile;
-                profile["serverUID"] = doc.serverUID;
-                event.reply("return-user-profiles", profile)
-                // profiles.push(response.profile);
-            }
-        });
+        // console.log(doc.serverUID);
+        // const newSocket = socketClient("http://localhost:8000", {
+        //     reconnectionDelayMax: 10000,
+        //     path: '/socket.io/sockets/' + doc.serverUID
+        // });
+        // await newSocket.emit("request-user-profile", {}, (response) => {
+        //     console.log("response from socket");
+        //     console.log(response);
+        //     if (response.status === 'ok') {
+        //         console.log("here")
+        //         let profile = response.profile;
+        //         profile["serverUID"] = doc.serverUID;
+        //         event.reply("return-user-profiles", profile)
+        //         // profiles.push(response.profile);
+        //     }
+        // });
+
+        requestSpecificUserProfile(doc.serverUID);
     }
     // event.reply("return-user-profiles", profiles);
+}
+
+async function requestSpecificUserProfile(userServerUID) {
+    const newSocket = socketClient("http://localhost:8000", {
+            reconnectionDelayMax: 10000,
+            path: '/socket.io/sockets/' + doc.serverUID
+    });
+    await newSocket.emit("request-user-profile", {}, (response) => {
+        console.log("response from socket");
+        console.log(response);
+        if (response.status === 'ok') {
+            console.log("here")
+            let profile = response.profile;
+            profile["serverUID"] = doc.serverUID;
+            event.reply("return-user-profiles", profile)
+            // profiles.push(response.profile);
+        }
+    });
 }
 
 ipcMain.on("register", (event, args) => {
@@ -258,6 +278,15 @@ ipcMain.on("get-user-profiles", (event, args) => {
 ipcMain.on("get-active-chats", (event, args) => {
     console.log("Fetching active chats");
     event.reply("return-active-chats", helper.getActiveChats());
+});
+
+ipcMain.on("send-query", (event, args) => {
+    // event.reply("return-query-resources", helper.sendMLQuery(args.query));
+    const result = helper.sendMLQuery(args.query);
+    result.authors.forEach((serverUID) => {
+        requestSpecificUserProfile(serverUID);
+    });
+    event.reply("return-query-resources", {resources: result.resources});
 });
 
 app.whenReady().then(createWindow);

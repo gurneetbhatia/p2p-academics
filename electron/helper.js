@@ -3,6 +3,10 @@ const { MongoClient } = require('mongodb');
 const { contextBridge, ipcRenderer, dialog } = require('electron');
 const path = require('path');
 const crypto = require('crypto');
+const pdf = require('pdf-parse');
+const axios = require('axios');
+
+const API_BASE_URL = "localhost:5000/";
 
 const dbUri = "mongodb+srv://dbUser:dbUserPassword@third-year-project.elclq.mongodb.net/desktop-app?retryWrites=true&w=majority";
 let client;
@@ -40,21 +44,25 @@ function getRepositoryResources() {
                 console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
+                    fileObjs.push(metaObj);
                     return true;
                 }
             });
             if (!metaObj) {
                 const fileid = generateServerUID();
-                metaObj =  {
-                    fileid: fileid,
-                    filename: filename,
-                    title: undefined,
-                    abstract: undefined,
-                    authors: undefined,
-                    knowledgeDomains: undefined
-                };
+                const dataBuffer = fs.readFileSync(directoryPath + '/' + filename);
+                pdf(dataBuffer).then((fileParsedData) => {
+                    metaObj = {
+                        fileid: fileid,
+                        filename: filename,
+                        title: fileParsedData.info.Title,
+                        author: fileParsedData.info.Author,
+                        abstract: undefined,
+                        knowledgeDomains: fileParsedData.info.Keywords
+                    };
+                    fileObjs.push(metaObj);
+                });
             }
-            fileObjs.push(metaObj);
         }
     })
 
@@ -258,6 +266,25 @@ function getActiveChats() {
     return JSON.parse(fs.readFileSync("./user/chats.json"));
 }
 
+async function sendMLQuery(query) {
+    const response = await axios.get(API_BASE_URL + 'get-papers-and-authors?query=' + query);
+    if (response.status === 'ok') {
+        //return response;
+        // response contains author and paper IDs
+        // we now need to fetch the papers here from the IDs
+        // the authors will be fetched using sockets in main.js
+        let papers = []
+        papers.forEach((paperId) => {
+            const resourcesCollection = db.collection("resources");
+            let result = resourcesCollection.findOne({fileid: paperId});
+            papers.push(JSON.parse(result));
+        });
+        return {resources: papers, authors: response.authors};
+    }
+    console.log('request failed for some reason');
+    return {authors: [], papers: []};
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     getRepositoryResources: getRepositoryResources,
@@ -276,5 +303,6 @@ module.exports = {
     createTempFile: createTempFile,
     getActiveServers: getActiveServers,
     getUserProfile: getUserProfile,
-    getActiveChats: getActiveChats
+    getActiveChats: getActiveChats,
+    sendMLQuery: sendMLQuery
 }
