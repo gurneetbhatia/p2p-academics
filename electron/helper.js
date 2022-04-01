@@ -16,17 +16,14 @@ async function connectToMongo() {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
-    console.log("CONNECTED TO MONGO");
 }
 
 function checkIfInitialised() {
     const dir = './user/meta.json';
 
     if (fs.existsSync(dir)) {
-        console.log('Initialised');
         return true;
     } else {
-        console.log('Not Initialised');
         return false;
     }
 }
@@ -234,14 +231,12 @@ function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
     const filesMeta = JSON.parse(fs.readFileSync(directoryPath + '/meta.json'));
-    console.log(filesMeta);
     let fileObjs = [];
     filenames.forEach((filename) => {
         if (filename !== "meta.json") {
             // check if the filename exists in meta.json
             let metaObj;
             filesMeta.some((element) => {
-                console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
                     fileObjs.push(metaObj);
@@ -271,7 +266,6 @@ function getRepositoryResources() {
 
 function generateServerUID() {
     var hash = crypto.randomBytes(20).toString('hex');
-    console.log("UNIQUE SERVER ID: " + hash)
     return hash;
 }
 
@@ -304,7 +298,6 @@ function updateResourcesList(serverUID) {
 }
 
 function closeApplication(serverUID) {
-    console.log("CLOSING APPLICATION [HELPER]")
     // from active-servers, remove the instance where the serverUID matches
     // from resources, take down all objects where the serverUID matches
     const db = client.db("desktop-app");
@@ -315,7 +308,6 @@ function closeApplication(serverUID) {
 }
 
 function handleUploadFilesClick() {
-    console.log("Upload file clicked [HELPER]");
     // const properties = process.platform === 'darwin' ? ['openFile', 'openDirectory'] : ['multiSelections'];
     dialog.showOpenDialog({
         title: 'Select the file to be uploaded',
@@ -329,10 +321,7 @@ function handleUploadFilesClick() {
         ],
         properties: ['multiSelections']
     }).then(files => {
-        console.log(files.canceled);
         if (!files.canceled) {
-            // global.filesUploadPath = files.filePaths;
-            console.log(files.filePaths);
             // upload files to the application Repository directory
             copyFilesToRepo(files.filePaths);
         }
@@ -368,11 +357,9 @@ function updateResource(fileprops) {
     }
     // if the filename doesn't already exist in meta.json, we initialise a new object
     // otherwise we update the relevant object with the new properties from fileprops
-    console.log("Update Resource [HELPER]");
     let metaFileObjects = getRepositoryResources();
     let updatedObjects = [];
     metaFileObjects.forEach((object) => {
-        console.log(object.filename + " " + fileprops.filename + " " + object.filename === fileprops.filename);
         if (object.filename === fileprops.filename) {
             updatedObjects.push(newFileObj);
         } else {
@@ -384,9 +371,6 @@ function updateResource(fileprops) {
     const content = JSON.stringify(updatedObjects);
 
     fs.writeFileSync(filepath, content);
-
-    console.log(updatedObjects);
-
 }
 
 function getActiveResources(serverUID) {
@@ -402,7 +386,6 @@ function getFilePath(fileid, filename) {
     const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
     let metaObj;
     filesMeta.some((element) => {
-        console.log(element.filename);
         if (element.fileid === fileid) {
             metaObj = element
             return true;
@@ -417,9 +400,7 @@ function getFilePath(fileid, filename) {
 }
 
 function getFileBuffer(fileid) {
-    console.log("GET FILE STREAM 0");
     const resources = getRepositoryResources();
-    console.log(resources);
     const directoryPath = __dirname + '/../Repository/';
 
     // const stream = fs.createReadStream(directoryPath);
@@ -432,7 +413,6 @@ function getFileBuffer(fileid) {
         }
     });
     if (metaObj) {
-        console.log("HERE")
         const buffer = fs.readFileSync(directoryPath + metaObj.filename);
         return buffer;
     }
@@ -481,7 +461,6 @@ async function sendMLQuery(query) {
         });
         return {resources: papers, authors: response.authors};
     }
-    console.log('request failed for some reason');
     return {authors: [], papers: []};
 }
 

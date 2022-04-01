@@ -39,9 +39,3 @@ contextBridge.exposeInMainWorld(
 window.sendToElectron = function(channel) {
     ipcRenderer.send(channel);
 }
-
-// ipcRenderer.on("return-repo-resources", (event, response) => {
-//     console.log("response from main in renderer");
-//     console.log(event);
-//     console.log(response);
-// })

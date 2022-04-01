@@ -31,11 +31,8 @@ async function initialiseServer() {
 
     // listen for connections to our socket server
     io.on('connection', (socket) => {
-        console.log("client connection detected");
         socket.on("request-resource", (args, callback) => {
             // a client has requested a file
-            console.log("resource request detected [SOCKET]");
-            console.log(args);
             const fileBuffer = helper.getFileBuffer(args.fileid);
             const output = fileBuffer ? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
             callback(output);
@@ -43,7 +40,6 @@ async function initialiseServer() {
 
         socket.on("request-user-profile", (args, callback) => {
             // a client has requested this users' profile
-            console.log("user profile request detected [SOCKET");
             const profile = helper.getUserProfile();
             // send the profile back in an encrypted format using the public key that they have provided
             callback(helper.encryptData({
@@ -107,7 +103,6 @@ function registerUser(data) {
 
         fs.writeFileSync(filepath, content);
     });
-    console.log("User file saved locally");
     win.loadURL(baseUrl + '/');
 }
 
@@ -126,11 +121,8 @@ async function requestSpecificUserProfile(event, userServerUID) {
             path: '/socket.io/sockets/' + userServerUID
     });
     await newSocket.emit("request-user-profile", {"publicKey": publicKey}, (response) => {
-        console.log("response from socket");
         helper.decryptData(response);
-        console.log(response);
         if (response.status === 'ok') {
-            console.log("here")
             let profile = response.profile;
             profile["serverUID"] = userServerUID;
             event.reply("return-user-profiles", profile)
@@ -150,13 +142,11 @@ ipcMain.on("navigate-to", (path) => {
 
 ipcMain.on("get-repo-resources", (event, args) => {
     // send a list of objects containing the resources held locally to the frontend
-    console.log("GETTING REPO RESOURCES [MAIN]");
     event.reply("return-repo-resources", helper.getRepositoryResources());
 });
 
 ipcMain.on("get-active-resources", (event, args) => {
     // get remote resources from the mongodb database
-    console.log("GETTING ACTIVE RESOURCES [MAIN]");
     helper.getActiveResources().toArray((err, documents) => {
         if (err) throw err;
 
@@ -166,14 +156,11 @@ ipcMain.on("get-active-resources", (event, args) => {
 
 ipcMain.on("upload-files-click", (event, args) => {
     // add the new file
-    console.log("Upload files clicked [MAIN]");
     helper.handleUploadFilesClick();
 });
 
 ipcMain.on("delete-resource", (event, args) => {
     // delete a resource
-    console.log("Deleting resource [MAIN]");
-    console.log(args);
     helper.deleteResource(args);
 });
 
@@ -189,18 +176,11 @@ ipcMain.on("view-file", (event, args) => {
     });
 
     const output = helper.getFilePath(args.fileid, args.filename);
-    console.log("in view-file");
-    console.log(output);
-    console.log(args.fileid);
     if (output?.filepath) {
-        console.log("here for some reason");
-        console.log(output?.filepath)
         win.loadURL(output.filepath);
     }
     else {
         // make a request to server uid for downloading fileid
-        console.log("initiating resource request");
-        // console.log(helper.getFileStream(args.fileid));
         helper.getActiveResources().toArray((err, documents) => {
             if (err) throw err;
     
@@ -210,17 +190,13 @@ ipcMain.on("view-file", (event, args) => {
                     serverUID = file.serverUID;
                 }
             });
-            console.log(serverUID);
             const newSocket = socketClient("http://localhost:8000", {
                 reconnectionDelayMax: 10000,
                 path: '/socket.io/sockets/' + serverUID
             });
-            console.log("Connected to " + serverUID);
             socketServers.push(newSocket);
             newSocket.emit("request-resource", {fileid: args.fileid}, (response) => {
-                console.log("Response from socket");
                 // write this buffer to a new file
-                console.log(response);
                 if (response.status === 'ok') {
                     const tempFilePath = helper.createTempFile(response.buffer, args.filename);
                     win.loadURL(tempFilePath);
@@ -231,7 +207,6 @@ ipcMain.on("view-file", (event, args) => {
 });
 
 ipcMain.on("get-user-profiles", (event, args) => {
-    console.log("Fetching user profiles");
     helper.getActiveServers().toArray((err, documents) => {
         if (err) throw err;
         requestUserProfiles(event, documents)
