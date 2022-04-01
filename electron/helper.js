@@ -89,6 +89,29 @@ function decryptData(data) {
     return decryptedData;
 }
 
+function initialiseNetworkGraph() {
+    let counter = 0;
+
+    let index_mappings = {};
+    getActiveServers().toArray((err, document) => {
+        if (err) throw err;
+        index_mappings[counter] = document.serverUID;
+
+        counter += 1;
+    });
+
+    let graph = new Graph(counter);
+    const parents = graph.prims_mst();
+
+    // now convert the indices in parents to an actual graph with serverUIDs from index_mappings
+    let graphConnections = {};
+    for (let index = 0;index < counter;index++) {
+        graphConnections[index_mappings[index]] = graphConnections[index_mappings[parents[index]]];
+    }
+
+    return graphConnections;
+}
+
 // The following classes (node1, Graph, and node) and functions (addEdge, prims_mst) are adapted from https://www.geeksforgeeks.org/prims-mst-for-adjacency-list-representation-greedy-algo-6/
 
 class node1
@@ -259,7 +282,7 @@ function reserveServerUID(serverUID) {
 
 function fetchActiveServers() {
     const db = client.db("desktop-app");
-    return db.collection("active-servers").find()
+    return db.collection("active-servers").find();
 }
 
 function updateResourcesList(serverUID) {
@@ -464,6 +487,7 @@ async function sendMLQuery(query) {
 
 module.exports = {
     checkIfInitialised: checkIfInitialised,
+    initialiseNetworkGraph: initialiseNetworkGraph,
     getRepositoryResources: getRepositoryResources,
     generateServerUID: generateServerUID,
     reserveServerUID: reserveServerUID,
