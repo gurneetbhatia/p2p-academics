@@ -16,9 +16,12 @@ let socketServerUID;
 
 async function initialiseServer() {
     await helper.connectToMongo();
+    // get a unique server UID for our client and reserve it in the database
     socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
+    // renew the public and private keys of data security
     helper.setupEncryption(socketServerUID);
+    // initialise the socket server
     io.attach(8080, {
         pingInterval: 10000,
         pingTimeout: 5000,
@@ -26,9 +29,11 @@ async function initialiseServer() {
         path: '/socket.io/sockets/' + socketServerUID
     });
 
+    // listen for connections to our socket server
     io.on('connection', (socket) => {
         console.log("client connection detected");
         socket.on("request-resource", (args, callback) => {
+            // a client has requested a file
             console.log("resource request detected [SOCKET]");
             console.log(args);
             const fileBuffer = helper.getFileBuffer(args.fileid);
@@ -37,8 +42,10 @@ async function initialiseServer() {
         });
 
         socket.on("request-user-profile", (args, callback) => {
+            // a client has requested this users' profile
             console.log("user profile request detected [SOCKET");
             const profile = helper.getUserProfile();
+            // send the profile back in an encrypted format using the public key that they have provided
             callback(helper.encryptData({
                 status: 'ok',
                 profile: profile
@@ -46,6 +53,7 @@ async function initialiseServer() {
         });
 
         socket.on("receive-message", (args, callback) => {
+            // add the message that we have received to our local copy of the chat
             const argsData = helper.decryptData(args);
             const sender = argsData.sender;
             const message = argsData.message;
@@ -63,6 +71,7 @@ const baseUrl = 'http://localhost:3000';
 let win;
 
 function createWindow() {
+    // initialise the browser window that will be linked up by electron and used for our frontend
     win = new BrowserWindow({
         width: 800,
         height: 600,
@@ -72,10 +81,9 @@ function createWindow() {
         }
     });
 
+    // check if the user has already registered this device and if not take them to the registration page first
     const extension = helper.checkIfInitialised() ? '/' : '/register';
     win.loadURL(baseUrl + extension);
-    // win.loadURL(`file://${path.join(__dirname, "../public/index.html")}`);
-    // win.loadFile('index.html');
 
     if (isDev) {
         win.webContents.openDevTools({mode: "detach"});
@@ -104,12 +112,14 @@ function registerUser(data) {
 }
 
 async function requestUserProfiles(event, documents) {
+    // request all user profiles on the network
     for(doc of documents) {
         requestSpecificUserProfile(event, doc.serverUID);
     }
 }
 
 async function requestSpecificUserProfile(event, userServerUID) {
+    // request the user profile of a specific user
     const publicKey = helper.getPublicKey();
     const newSocket = socketClient("http://localhost:8000", {
             reconnectionDelayMax: 10000,
@@ -129,23 +139,24 @@ async function requestSpecificUserProfile(event, userServerUID) {
 }
 
 ipcMain.on("register", (event, args) => {
+    // register user with the arguments received from the frontend
     registerUser(args);
 });
 
 ipcMain.on("navigate-to", (path) => {
+    // path change request from frontend
     win.loadUrl(baseUrl + path);
 });
 
 ipcMain.on("get-repo-resources", (event, args) => {
+    // send a list of objects containing the resources held locally to the frontend
     console.log("GETTING REPO RESOURCES [MAIN]");
     event.reply("return-repo-resources", helper.getRepositoryResources());
-    // event.reply("return-repo-resources", "test response");
-    //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
 });
 
 ipcMain.on("get-active-resources", (event, args) => {
+    // get remote resources from the mongodb database
     console.log("GETTING ACTIVE RESOURCES [MAIN]");
-    // event.reply("return-active-resources", helper.getActiveResources());
     helper.getActiveResources().toArray((err, documents) => {
         if (err) throw err;
 
@@ -154,17 +165,20 @@ ipcMain.on("get-active-resources", (event, args) => {
 });
 
 ipcMain.on("upload-files-click", (event, args) => {
+    // add the new file
     console.log("Upload files clicked [MAIN]");
     helper.handleUploadFilesClick();
 });
 
 ipcMain.on("delete-resource", (event, args) => {
+    // delete a resource
     console.log("Deleting resource [MAIN]");
     console.log(args);
     helper.deleteResource(args);
 });
 
 ipcMain.on("update-resource", (event, args) => {
+    // update the metadata of a resource
     helper.updateResource(args);
 });
 
@@ -173,7 +187,6 @@ ipcMain.on("view-file", (event, args) => {
         width: 800,
         height: 600
     });
-    // win.loadURL(__dirname + '/../Repository/' + args.filename)
 
     const output = helper.getFilePath(args.fileid, args.filename);
     console.log("in view-file");
