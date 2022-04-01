@@ -8,7 +8,6 @@ import RepositoryPage from './repository-page';
 import ExplorePage from './explore-page';
 import FindPeoplePage from './find-people-page';
 import ChatsPage from './chats-page';
-import SettingsPage from './settings-page';
 
 class HomePage extends React.Component {
     render() {
@@ -24,9 +23,7 @@ class HomePage extends React.Component {
                             <Route path='/repository' component={RepositoryPage}/>
                             <Route path='/explore' component={ExplorePage}/>
                             <Route path='/find-people' component={FindPeoplePage}/>
-                            <Route path='/chats' component={ChatsPage}/>
-                            <Route path='/settings' component={SettingsPage}/>
-                        </Switch>
+                            <Route path='/chats' component={ChatsPage}/>                        </Switch>
                     </Col>
                 </Row>
             </Container>

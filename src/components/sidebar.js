@@ -35,11 +35,6 @@ class Sidebar extends React.Component {
                         <Nav.Link href='/chats'><FontAwesomeIcon icon={faComment}/></Nav.Link>
                     </OverlayTrigger>
                 </Nav.Item>
-                <Nav.Item>
-                    <OverlayTrigger key="right" placement="right" overlay={<Tooltip>Settings</Tooltip>}>
-                        <Nav.Link href='/settings'><FontAwesomeIcon icon={faCog}/></Nav.Link>
-                    </OverlayTrigger>
-                </Nav.Item>
             </Nav>
         );
     }

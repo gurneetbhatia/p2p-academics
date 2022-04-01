@@ -48,7 +48,7 @@ function setupEncryption(serverUID) {
     }, (err, publicKey, privateKey) => {
         if (err) throw err;
 
-        fs.writeFileSync(__dirname + '/../user/keys.json', {"publicKey": publicKey, "privateKey": privateKey});
+        fs.writeFileSync(__dirname + '/../user/keys.json', JSON.stringify({"publicKey": publicKey, "privateKey": privateKey}));
     });
 }
 
@@ -497,7 +497,7 @@ function addMessage(senderUID, message, timestamp, sender) {
         sender: sender
     });
 
-    fs.writeFileSync('./user/chats.json', messages);
+    fs.writeFileSync('./user/chats.json', JSON.stringify(messages));
 }
 
 function receiveMessage(sender, message, timestamp) {
