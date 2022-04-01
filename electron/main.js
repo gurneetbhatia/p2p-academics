@@ -52,7 +52,7 @@ async function initialiseServer() {
             const timestamp = argsData.timestamp;
 
             helper.receiveMessage(sender, message, timestamp);
-        })
+        });
     });
     helper.updateResourcesList(socketServerUID);
 }
