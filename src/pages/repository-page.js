@@ -2,17 +2,6 @@ import React from 'react';
 import Button from 'react-bootstrap/Button';
 import ResourceCard from '../components/resource-card';
 
-// let resourcesList = [];
-// window.api.receive("return-repo-resources", (response) => {
-//     console.log("[REACT repository-page]")
-//     console.log(response);
-//     if (response) {
-//         resourcesList = response;
-//     }
-// });
-
-// window.api.send("get-repo-resources", {});
-
 class RepositoryPage extends React.Component {
     constructor(props) {
         super(props);

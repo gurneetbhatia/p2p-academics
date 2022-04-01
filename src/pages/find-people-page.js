@@ -13,11 +13,8 @@ class FindPeoplePage extends React.Component {
         window.api.receive("return-user-profiles", (response) => {
             if (response) {
                 // this.setState({profiles: response});
-                console.log("in return user profiles");
-                console.log(response);
                 const found = this.state.profiles.some(el => el.serverUID === response.serverUID);
                 if (!found) {
-                    console.log("new profile received");
                     let newProfiles = this.state.profiles;
                     newProfiles.push(response);
                     this.setState({profiles: newProfiles});

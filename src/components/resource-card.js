@@ -45,7 +45,6 @@ class ResourceCard extends React.Component {
     }
 
     handleInfoModalSubmit(event) {
-        console.log(event);
         event.preventDefault();
         window.api.send("update-resource", this.state);
     }

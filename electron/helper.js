@@ -16,17 +16,14 @@ async function connectToMongo() {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });
-    console.log("CONNECTED TO MONGO");
 }
 
 function checkIfInitialised() {
     const dir = './user/meta.json';
 
     if (fs.existsSync(dir)) {
-        console.log('Initialised');
         return true;
     } else {
-        console.log('Not Initialised');
         return false;
     }
 }
@@ -48,7 +45,7 @@ function setupEncryption(serverUID) {
     }, (err, publicKey, privateKey) => {
         if (err) throw err;
 
-        fs.writeFileSync(__dirname + '/../user/keys.json', {"publicKey": publicKey, "privateKey": privateKey});
+        fs.writeFileSync(__dirname + '/../user/keys.json', JSON.stringify({"publicKey": publicKey, "privateKey": privateKey}));
     });
 }
 
@@ -89,18 +86,157 @@ function decryptData(data) {
     return decryptedData;
 }
 
+function initialiseNetworkGraph() {
+    let counter = 0;
+
+    let index_mappings = {};
+    getActiveServers().toArray((err, document) => {
+        if (err) throw err;
+        index_mappings[counter] = document.serverUID;
+
+        counter += 1;
+    });
+
+    let graph = new Graph(counter);
+    const parents = graph.prims_mst();
+
+    // now convert the indices in parents to an actual graph with serverUIDs from index_mappings
+    let graphConnections = {};
+    for (let index = 0;index < counter;index++) {
+        graphConnections[index_mappings[index]] = graphConnections[index_mappings[parents[index]]];
+    }
+
+    return graphConnections;
+}
+
+// The following classes (node1, Graph, and node) and functions (addEdge, prims_mst) are adapted from https://www.geeksforgeeks.org/prims-mst-for-adjacency-list-representation-greedy-algo-6/
+
+class node1
+{
+	constructor(a,b)
+	{
+		this.dest = a;
+		this.weight = b;
+	}
+}
+
+class Graph
+{
+	constructor(e)
+	{
+		this.V=e;
+		this.adj = new Array(V);
+		for (let o = 0; o < V; o++)
+			this.adj[o] = [];
+	}
+}
+
+// class to represent a node in PriorityQueue
+	// Stores a vertex and its corresponding
+	// key value
+class node
+{
+	constructor()
+	{
+		this.vertex=0;
+		this.key=0;
+	}
+}
+
+// method to add an edge
+	// between two vertices
+function addEdge(graph,src,dest,weight)
+{
+	let node0 = new node1(dest, weight);
+		let node = new node1(src, weight);
+		graph.adj[src].push(node0);
+		graph.adj[dest].push(node);
+}
+
+// method used to find the mst
+function prims_mst(graph)
+{
+	// Whether a vertex is in PriorityQueue or not
+    let mstset = new Array(graph.V);
+    let e = new Array(graph.V);
+
+    // Stores the parents of a vertex
+    let parent = new Array(graph.V);
+
+    for (let o = 0; o < graph.V; o++)
+    {
+        
+        e[o] = new node();
+    }
+    for (let o = 0; o < graph.V; o++) {
+
+        // Initialize to false
+        mstset[o] = false;
+
+        // Initialize key values to infinity
+        e[o].key = Number.MAX_VALUE;
+        e[o].vertex = o;
+        parent[o] = -1;
+    }
+
+    // Include the source vertex in mstset
+    mstset[0] = true;
+
+    // Set key value to 0
+    // so that it is extracted first
+    // out of PriorityQueue
+    e[0].key = 0;
+
+    // Use TreeSet instead of PriorityQueue as the remove function of the PQ is O(n) in java.
+    let queue = [];
+
+    for (let o = 0; o < graph.V; o++)
+        queue.push(e[o]);
+    
+    queue.sort(function(a,b){return a.key-b.key;});
+
+    // Loops until the queue is not empty
+    while (queue.length!=0) {
+
+        // Extracts a node with min key value
+        let node0 = queue.shift();
+
+        // Include that node into mstset
+        mstset[node0.vertex] = true;
+
+        // For all adjacent vertex of the extracted vertex V
+        for (let iterator of graph.adj[node0.vertex].values()) {
+
+            // If V is in queue
+            if (mstset[iterator.dest] == false) {
+                // If the key value of the adjacent vertex is
+                // more than the extracted key
+                // update the key value of adjacent vertex
+                // to update first remove and add the updated vertex
+                if (e[iterator.dest].key > iterator.weight) {
+                    queue.splice(queue.indexOf(e[iterator.dest]),1);
+                    e[iterator.dest].key = iterator.weight;
+                    queue.push(e[iterator.dest]);
+                    queue.sort(function(a,b){return a.key-b.key;});
+                    parent[iterator.dest] = node0.vertex;
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
     const filesMeta = JSON.parse(fs.readFileSync(directoryPath + '/meta.json'));
-    console.log(filesMeta);
     let fileObjs = [];
     filenames.forEach((filename) => {
         if (filename !== "meta.json") {
             // check if the filename exists in meta.json
             let metaObj;
             filesMeta.some((element) => {
-                console.log(element.filename);
                 if (element.filename === filename) {
                     metaObj = element
                     fileObjs.push(metaObj);
@@ -130,7 +266,6 @@ function getRepositoryResources() {
 
 function generateServerUID() {
     var hash = crypto.randomBytes(20).toString('hex');
-    console.log("UNIQUE SERVER ID: " + hash)
     return hash;
 }
 
@@ -141,7 +276,7 @@ function reserveServerUID(serverUID) {
 
 function fetchActiveServers() {
     const db = client.db("desktop-app");
-    return db.collection("active-servers").find()
+    return db.collection("active-servers").find();
 }
 
 function updateResourcesList(serverUID) {
@@ -163,7 +298,6 @@ function updateResourcesList(serverUID) {
 }
 
 function closeApplication(serverUID) {
-    console.log("CLOSING APPLICATION [HELPER]")
     // from active-servers, remove the instance where the serverUID matches
     // from resources, take down all objects where the serverUID matches
     const db = client.db("desktop-app");
@@ -174,7 +308,6 @@ function closeApplication(serverUID) {
 }
 
 function handleUploadFilesClick() {
-    console.log("Upload file clicked [HELPER]");
     // const properties = process.platform === 'darwin' ? ['openFile', 'openDirectory'] : ['multiSelections'];
     dialog.showOpenDialog({
         title: 'Select the file to be uploaded',
@@ -188,10 +321,7 @@ function handleUploadFilesClick() {
         ],
         properties: ['multiSelections']
     }).then(files => {
-        console.log(files.canceled);
         if (!files.canceled) {
-            // global.filesUploadPath = files.filePaths;
-            console.log(files.filePaths);
             // upload files to the application Repository directory
             copyFilesToRepo(files.filePaths);
         }
@@ -227,11 +357,9 @@ function updateResource(fileprops) {
     }
     // if the filename doesn't already exist in meta.json, we initialise a new object
     // otherwise we update the relevant object with the new properties from fileprops
-    console.log("Update Resource [HELPER]");
     let metaFileObjects = getRepositoryResources();
     let updatedObjects = [];
     metaFileObjects.forEach((object) => {
-        console.log(object.filename + " " + fileprops.filename + " " + object.filename === fileprops.filename);
         if (object.filename === fileprops.filename) {
             updatedObjects.push(newFileObj);
         } else {
@@ -243,9 +371,6 @@ function updateResource(fileprops) {
     const content = JSON.stringify(updatedObjects);
 
     fs.writeFileSync(filepath, content);
-
-    console.log(updatedObjects);
-
 }
 
 function getActiveResources(serverUID) {
@@ -261,7 +386,6 @@ function getFilePath(fileid, filename) {
     const filesMeta = JSON.parse(fs.readFileSync(directoryPath + 'meta.json'));
     let metaObj;
     filesMeta.some((element) => {
-        console.log(element.filename);
         if (element.fileid === fileid) {
             metaObj = element
             return true;
@@ -276,9 +400,7 @@ function getFilePath(fileid, filename) {
 }
 
 function getFileBuffer(fileid) {
-    console.log("GET FILE STREAM 0");
     const resources = getRepositoryResources();
-    console.log(resources);
     const directoryPath = __dirname + '/../Repository/';
 
     // const stream = fs.createReadStream(directoryPath);
@@ -291,7 +413,6 @@ function getFileBuffer(fileid) {
         }
     });
     if (metaObj) {
-        console.log("HERE")
         const buffer = fs.readFileSync(directoryPath + metaObj.filename);
         return buffer;
     }
@@ -340,12 +461,35 @@ async function sendMLQuery(query) {
         });
         return {resources: papers, authors: response.authors};
     }
-    console.log('request failed for some reason');
     return {authors: [], papers: []};
+}
+
+function addMessage(senderUID, message, timestamp, sender) {
+    let messages = JSON.parse(fs.readFileSync('./user/chats.json'));
+    if (!messages.hasOwnProperty(senderUID)) {
+        messages[senderUID] = [];
+    }
+
+    messages[senderUID].push({
+        message: message,
+        timestamp: timestamp,
+        sender: sender
+    });
+
+    fs.writeFileSync('./user/chats.json', JSON.stringify(messages));
+}
+
+function receiveMessage(sender, message, timestamp) {
+    addMessage(sender, message, timestamp, false)
+}
+
+function sendMessage(sender, message, timestamp) {
+    addMessage(sender, message, timestamp, true);
 }
 
 module.exports = {
     checkIfInitialised: checkIfInitialised,
+    initialiseNetworkGraph: initialiseNetworkGraph,
     getRepositoryResources: getRepositoryResources,
     generateServerUID: generateServerUID,
     reserveServerUID: reserveServerUID,
@@ -367,5 +511,7 @@ module.exports = {
     setupEncryption: setupEncryption,
     getPublicKey: getPublicKey,
     encryptData: encryptData,
-    decryptData: decryptData
+    decryptData: decryptData,
+    receiveMessage: receiveMessage,
+    sendMessage: sendMessage
 };

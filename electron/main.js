@@ -9,7 +9,6 @@ const io = require("socket.io")();
 const socketClient = require("socket.io-client");
 const helper = require('./helper');
 const PDFWindow = require('electron-pdf-window');
-const socketStream = require("socket.io-stream");
 
 let socketServers = []
 
@@ -17,9 +16,12 @@ let socketServerUID;
 
 async function initialiseServer() {
     await helper.connectToMongo();
+    // get a unique server UID for our client and reserve it in the database
     socketServerUID = helper.generateServerUID();
     helper.reserveServerUID(socketServerUID);
+    // renew the public and private keys of data security
     helper.setupEncryption(socketServerUID);
+    // initialise the socket server
     io.attach(8080, {
         pingInterval: 10000,
         pingTimeout: 5000,
@@ -27,24 +29,34 @@ async function initialiseServer() {
         path: '/socket.io/sockets/' + socketServerUID
     });
 
+    // listen for connections to our socket server
     io.on('connection', (socket) => {
-        console.log("client connection detected");
         socket.on("request-resource", (args, callback) => {
-            console.log("resource request detected [SOCKET]");
-            console.log(args);
+            // a client has requested a file
             const fileBuffer = helper.getFileBuffer(args.fileid);
             const output = fileBuffer ? {status: 'ok', buffer: fileBuffer} : {status: 'fail', fileBuffer: null}
             callback(output);
         });
 
         socket.on("request-user-profile", (args, callback) => {
-            console.log("user profile request detected [SOCKET");
+            // a client has requested this users' profile
             const profile = helper.getUserProfile();
+            // send the profile back in an encrypted format using the public key that they have provided
             callback(helper.encryptData({
                 status: 'ok',
                 profile: profile
             }, args.publicKey));
-        })
+        });
+
+        socket.on("receive-message", (args, callback) => {
+            // add the message that we have received to our local copy of the chat
+            const argsData = helper.decryptData(args);
+            const sender = argsData.sender;
+            const message = argsData.message;
+            const timestamp = argsData.timestamp;
+
+            helper.receiveMessage(sender, message, timestamp);
+        });
     });
     helper.updateResourcesList(socketServerUID);
 }
@@ -55,6 +67,7 @@ const baseUrl = 'http://localhost:3000';
 let win;
 
 function createWindow() {
+    // initialise the browser window that will be linked up by electron and used for our frontend
     win = new BrowserWindow({
         width: 800,
         height: 600,
@@ -64,10 +77,9 @@ function createWindow() {
         }
     });
 
+    // check if the user has already registered this device and if not take them to the registration page first
     const extension = helper.checkIfInitialised() ? '/' : '/register';
     win.loadURL(baseUrl + extension);
-    // win.loadURL(`file://${path.join(__dirname, "../public/index.html")}`);
-    // win.loadFile('index.html');
 
     if (isDev) {
         win.webContents.openDevTools({mode: "detach"});
@@ -91,28 +103,26 @@ function registerUser(data) {
 
         fs.writeFileSync(filepath, content);
     });
-    console.log("User file saved locally");
     win.loadURL(baseUrl + '/');
 }
 
 async function requestUserProfiles(event, documents) {
+    // request all user profiles on the network
     for(doc of documents) {
         requestSpecificUserProfile(event, doc.serverUID);
     }
 }
 
 async function requestSpecificUserProfile(event, userServerUID) {
+    // request the user profile of a specific user
     const publicKey = helper.getPublicKey();
     const newSocket = socketClient("http://localhost:8000", {
             reconnectionDelayMax: 10000,
             path: '/socket.io/sockets/' + userServerUID
     });
     await newSocket.emit("request-user-profile", {"publicKey": publicKey}, (response) => {
-        console.log("response from socket");
         helper.decryptData(response);
-        console.log(response);
         if (response.status === 'ok') {
-            console.log("here")
             let profile = response.profile;
             profile["serverUID"] = userServerUID;
             event.reply("return-user-profiles", profile)
@@ -121,23 +131,22 @@ async function requestSpecificUserProfile(event, userServerUID) {
 }
 
 ipcMain.on("register", (event, args) => {
+    // register user with the arguments received from the frontend
     registerUser(args);
 });
 
 ipcMain.on("navigate-to", (path) => {
+    // path change request from frontend
     win.loadUrl(baseUrl + path);
 });
 
 ipcMain.on("get-repo-resources", (event, args) => {
-    console.log("GETTING REPO RESOURCES [MAIN]");
+    // send a list of objects containing the resources held locally to the frontend
     event.reply("return-repo-resources", helper.getRepositoryResources());
-    // event.reply("return-repo-resources", "test response");
-    //win.webContents.send("return-repo-resources", helper.getRepositoryResources());
 });
 
 ipcMain.on("get-active-resources", (event, args) => {
-    console.log("GETTING ACTIVE RESOURCES [MAIN]");
-    // event.reply("return-active-resources", helper.getActiveResources());
+    // get remote resources from the mongodb database
     helper.getActiveResources().toArray((err, documents) => {
         if (err) throw err;
 
@@ -146,17 +155,17 @@ ipcMain.on("get-active-resources", (event, args) => {
 });
 
 ipcMain.on("upload-files-click", (event, args) => {
-    console.log("Upload files clicked [MAIN]");
+    // add the new file
     helper.handleUploadFilesClick();
 });
 
 ipcMain.on("delete-resource", (event, args) => {
-    console.log("Deleting resource [MAIN]");
-    console.log(args);
+    // delete a resource
     helper.deleteResource(args);
 });
 
 ipcMain.on("update-resource", (event, args) => {
+    // update the metadata of a resource
     helper.updateResource(args);
 });
 
@@ -165,21 +174,13 @@ ipcMain.on("view-file", (event, args) => {
         width: 800,
         height: 600
     });
-    // win.loadURL(__dirname + '/../Repository/' + args.filename)
 
     const output = helper.getFilePath(args.fileid, args.filename);
-    console.log("in view-file");
-    console.log(output);
-    console.log(args.fileid);
     if (output?.filepath) {
-        console.log("here for some reason");
-        console.log(output?.filepath)
         win.loadURL(output.filepath);
     }
     else {
         // make a request to server uid for downloading fileid
-        console.log("initiating resource request");
-        // console.log(helper.getFileStream(args.fileid));
         helper.getActiveResources().toArray((err, documents) => {
             if (err) throw err;
     
@@ -189,17 +190,13 @@ ipcMain.on("view-file", (event, args) => {
                     serverUID = file.serverUID;
                 }
             });
-            console.log(serverUID);
             const newSocket = socketClient("http://localhost:8000", {
                 reconnectionDelayMax: 10000,
                 path: '/socket.io/sockets/' + serverUID
             });
-            console.log("Connected to " + serverUID);
             socketServers.push(newSocket);
             newSocket.emit("request-resource", {fileid: args.fileid}, (response) => {
-                console.log("Response from socket");
                 // write this buffer to a new file
-                console.log(response);
                 if (response.status === 'ok') {
                     const tempFilePath = helper.createTempFile(response.buffer, args.filename);
                     win.loadURL(tempFilePath);
@@ -210,7 +207,6 @@ ipcMain.on("view-file", (event, args) => {
 });
 
 ipcMain.on("get-user-profiles", (event, args) => {
-    console.log("Fetching user profiles");
     helper.getActiveServers().toArray((err, documents) => {
         if (err) throw err;
         requestUserProfiles(event, documents)
