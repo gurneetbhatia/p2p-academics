@@ -9,7 +9,6 @@ const io = require("socket.io")();
 const socketClient = require("socket.io-client");
 const helper = require('./helper');
 const PDFWindow = require('electron-pdf-window');
-const socketStream = require("socket.io-stream");
 
 let socketServers = []
 
