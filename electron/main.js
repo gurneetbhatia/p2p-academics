@@ -43,6 +43,15 @@ async function initialiseServer() {
                 status: 'ok',
                 profile: profile
             }, args.publicKey));
+        });
+
+        socket.on("receive-message", (args, callback) => {
+            const argsData = helper.decryptData(args);
+            const sender = argsData.sender;
+            const message = argsData.message;
+            const timestamp = argsData.timestamp;
+
+            helper.receiveMessage(sender, message, timestamp);
         })
     });
     helper.updateResourcesList(socketServerUID);

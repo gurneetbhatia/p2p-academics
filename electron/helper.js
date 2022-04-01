@@ -485,6 +485,29 @@ async function sendMLQuery(query) {
     return {authors: [], papers: []};
 }
 
+function addMessage(senderUID, message, timestamp, sender) {
+    let messages = JSON.parse(fs.readFileSync('./user/chats.json'));
+    if (!messages.hasOwnProperty(senderUID)) {
+        messages[senderUID] = [];
+    }
+
+    messages[senderUID].push({
+        message: message,
+        timestamp: timestamp,
+        sender: sender
+    });
+
+    fs.writeFileSync('./user/chats.json', messages);
+}
+
+function receiveMessage(sender, message, timestamp) {
+    addMessage(sender, message, timestamp, false)
+}
+
+function sendMessage(sender, message, timestamp) {
+    addMessage(sender, message, timestamp, true);
+}
+
 module.exports = {
     checkIfInitialised: checkIfInitialised,
     initialiseNetworkGraph: initialiseNetworkGraph,
@@ -509,5 +532,7 @@ module.exports = {
     setupEncryption: setupEncryption,
     getPublicKey: getPublicKey,
     encryptData: encryptData,
-    decryptData: decryptData
+    decryptData: decryptData,
+    receiveMessage: receiveMessage,
+    sendMessage: sendMessage
 };
