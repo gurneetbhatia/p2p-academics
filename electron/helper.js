@@ -89,6 +89,124 @@ function decryptData(data) {
     return decryptedData;
 }
 
+// The following classes (node1, Graph, and node) and functions (addEdge, prims_mst) are adapted from https://www.geeksforgeeks.org/prims-mst-for-adjacency-list-representation-greedy-algo-6/
+
+class node1
+{
+	constructor(a,b)
+	{
+		this.dest = a;
+		this.weight = b;
+	}
+}
+
+class Graph
+{
+	constructor(e)
+	{
+		this.V=e;
+		this.adj = new Array(V);
+		for (let o = 0; o < V; o++)
+			this.adj[o] = [];
+	}
+}
+
+// class to represent a node in PriorityQueue
+	// Stores a vertex and its corresponding
+	// key value
+class node
+{
+	constructor()
+	{
+		this.vertex=0;
+		this.key=0;
+	}
+}
+
+// method to add an edge
+	// between two vertices
+function addEdge(graph,src,dest,weight)
+{
+	let node0 = new node1(dest, weight);
+		let node = new node1(src, weight);
+		graph.adj[src].push(node0);
+		graph.adj[dest].push(node);
+}
+
+// method used to find the mst
+function prims_mst(graph)
+{
+	// Whether a vertex is in PriorityQueue or not
+    let mstset = new Array(graph.V);
+    let e = new Array(graph.V);
+
+    // Stores the parents of a vertex
+    let parent = new Array(graph.V);
+
+    for (let o = 0; o < graph.V; o++)
+    {
+        
+        e[o] = new node();
+    }
+    for (let o = 0; o < graph.V; o++) {
+
+        // Initialize to false
+        mstset[o] = false;
+
+        // Initialize key values to infinity
+        e[o].key = Number.MAX_VALUE;
+        e[o].vertex = o;
+        parent[o] = -1;
+    }
+
+    // Include the source vertex in mstset
+    mstset[0] = true;
+
+    // Set key value to 0
+    // so that it is extracted first
+    // out of PriorityQueue
+    e[0].key = 0;
+
+    // Use TreeSet instead of PriorityQueue as the remove function of the PQ is O(n) in java.
+    let queue = [];
+
+    for (let o = 0; o < graph.V; o++)
+        queue.push(e[o]);
+    
+    queue.sort(function(a,b){return a.key-b.key;});
+
+    // Loops until the queue is not empty
+    while (queue.length!=0) {
+
+        // Extracts a node with min key value
+        let node0 = queue.shift();
+
+        // Include that node into mstset
+        mstset[node0.vertex] = true;
+
+        // For all adjacent vertex of the extracted vertex V
+        for (let iterator of graph.adj[node0.vertex].values()) {
+
+            // If V is in queue
+            if (mstset[iterator.dest] == false) {
+                // If the key value of the adjacent vertex is
+                // more than the extracted key
+                // update the key value of adjacent vertex
+                // to update first remove and add the updated vertex
+                if (e[iterator.dest].key > iterator.weight) {
+                    queue.splice(queue.indexOf(e[iterator.dest]),1);
+                    e[iterator.dest].key = iterator.weight;
+                    queue.push(e[iterator.dest]);
+                    queue.sort(function(a,b){return a.key-b.key;});
+                    parent[iterator.dest] = node0.vertex;
+                }
+            }
+        }
+    }
+
+    return parent;
+}
+
 function getRepositoryResources() {
     const directoryPath = __dirname + '/../Repository';
     const filenames = fs.readdirSync(directoryPath);
